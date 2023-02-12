@@ -1,5 +1,8 @@
 import {
-  Box,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
   Button,
   FormControl,
   FormErrorMessage,
@@ -17,65 +20,82 @@ type Props = {};
 const PasswordRecoveryForm = (props: Props) => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [success, setSuccess] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const emailError = email === "";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       await sendPasswordResetEmail(userAuth, email);
       setSuccess(true);
     } catch (err) {
+      setSuccess(false);
+      console.error(err);
       setErrorMessage(err.message);
     }
+    setLoading(false);
   };
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit}>
-        <Stack spacing="4">
-          <FormControl id="email" isInvalid={Boolean(errorMessage)}>
-            <FormLabel>Email address</FormLabel>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setErrorMessage("");
-              }}
-              isRequired
+    <form onSubmit={handleSubmit}>
+      <Stack spacing="4">
+        <FormControl id="email" isInvalid={Boolean(errorMessage)}>
+          <FormLabel>Email address</FormLabel>
+          <Input
+            placeholder="Enter your email..."
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrorMessage("");
+            }}
+            isRequired
+          />
+          {!emailError ? (
+            ""
+          ) : (
+            <FormErrorMessage> Email is required </FormErrorMessage>
+          )}
+        </FormControl>
+        {success && (
+          <Alert status="success">
+            <AlertIcon />
+            <AlertTitle>An email has been sent to your inbox!</AlertTitle>
+          </Alert>
+        )}
+        {errorMessage && (
+          <Alert status="error">
+            <AlertIcon />
+            <AlertTitle>User is not found.</AlertTitle>
+            <AlertDescription>
+              Maybe your email is wrong, or it doesn't exist.
+            </AlertDescription>
+          </Alert>
+        )}
+        <Button
+          type="submit"
+          colorScheme="blue"
+          size="lg"
+          isLoading={isLoading}
+          spinnerPlacement={"start"}
+          spinner={
+            <Spinner
+              style={{ marginLeft: "0.5rem" }}
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="md"
             />
-            {!emailError ? (
-              ""
-            ) : (
-              <FormErrorMessage> Email is required </FormErrorMessage>
-            )}
-          </FormControl>
-          <Button
-            type="submit"
-            colorScheme="blue"
-            size="lg"
-            isLoading={isLoading}
-            spinnerPlacement={"start"}
-            spinner={
-              <Spinner
-                style={{ marginLeft: "0.5rem" }}
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="blue.500"
-                size="md"
-              />
-            }
-          >
-            Reset Password
-          </Button>
-        </Stack>
-      </form>
-    </Box>
+          }
+        >
+          Reset Password
+        </Button>
+      </Stack>
+    </form>
   );
 };
 

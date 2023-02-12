@@ -52,74 +52,74 @@ const AuthForm = (props: Props) => {
   };
 
   return (
-    <Box>
-      <form onSubmit={handleSubmit}>
-        <Stack spacing="4">
-          <FormControl id="email" isInvalid={Boolean(errorMessage)}>
-            <FormLabel>Email address</FormLabel>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setErrorMessage("");
-              }}
-              isRequired
-            />
-            {!emailError ? (
-              ""
-            ) : (
-              <FormErrorMessage> Email is required </FormErrorMessage>
-            )}
-          </FormControl>
-          <FormControl id="password" isInvalid={Boolean(errorMessage)}>
-            <FormLabel>Password</FormLabel>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setErrorMessage("");
-              }}
-              isRequired
-            />
-            {!passwordError ? (
-              ""
-            ) : (
-              <FormErrorMessage> Password is required </FormErrorMessage>
-            )}
-          </FormControl>
-          {errorMessage && (
-            <Alert status="error">
-              <AlertIcon />
-              <AlertTitle>Wrong login credentials</AlertTitle>
-              <AlertDescription>
-                Either wrong email or password, or user doesn't exist
-              </AlertDescription>
-            </Alert>
+    <form onSubmit={handleSubmit}>
+      <Stack spacing="4">
+        <FormControl id="email" isInvalid={Boolean(errorMessage)}>
+          <FormLabel>Email address</FormLabel>
+          <Input
+            type="email"
+            placeholder="Enter your email..."
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrorMessage("");
+            }}
+            isRequired
+          />
+          {!emailError ? (
+            ""
+          ) : (
+            <FormErrorMessage> Email is required </FormErrorMessage>
           )}
-          <Button
-            type="submit"
-            colorScheme="blue"
-            size="lg"
-            isLoading={isLoading}
-            spinnerPlacement={"start"}
-            spinner={
-              <Spinner
-                style={{ marginLeft: "0.5rem" }}
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="blue.500"
-                size="md"
-              />
-            }
-          >
-            Login
-          </Button>
-        </Stack>
-      </form>
-    </Box>
+        </FormControl>
+        <FormControl id="password" isInvalid={Boolean(errorMessage)}>
+          <FormLabel>Password</FormLabel>
+          <Input
+            type="password"
+            value={password}
+            placeholder="Enter your password..."
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrorMessage("");
+            }}
+            isRequired
+          />
+          {!passwordError ? (
+            ""
+          ) : (
+            <FormErrorMessage> Password is required </FormErrorMessage>
+          )}
+        </FormControl>
+        {errorMessage && (
+          <Alert status="error">
+            <AlertIcon />
+            <AlertTitle>Wrong login credentials</AlertTitle>
+            <AlertDescription>
+              Either wrong email or password, or user doesn't exist
+            </AlertDescription>
+          </Alert>
+        )}
+        <Button
+          type="submit"
+          colorScheme="blue"
+          size="lg"
+          isLoading={isLoading}
+          spinnerPlacement={"start"}
+          spinner={
+            <Spinner
+              style={{ marginLeft: "0.5rem" }}
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="md"
+            />
+          }
+        >
+          Login
+        </Button>
+      </Stack>
+    </form>
   );
 };
 

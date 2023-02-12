@@ -1,7 +1,7 @@
 import { Box, Center, Heading } from "@chakra-ui/react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import AuthForm from "../components/auth/AuthForm";
-import PasswordRecoveryForm from "../components/passwordRecovery/passwordRecoveryForm";
+import PasswordRecoveryForm from "../components/passwordRecovery/PasswordRecoveryForm";
 
 const LoginPage = () => {
   return (
@@ -10,7 +10,7 @@ const LoginPage = () => {
         <Heading as="h1" size="xl" mb="6">
           Memberflow.
         </Heading>
-        <Tabs>
+        <Tabs isFitted variant='soft-rounded'>
           <TabList>
             <Tab>Login</Tab>
             <Tab>Forgotten your password?</Tab>
