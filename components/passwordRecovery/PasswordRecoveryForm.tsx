@@ -31,6 +31,7 @@ const PasswordRecoveryForm = (props: Props) => {
     try {
       await sendPasswordResetEmail(userAuth, email);
       setSuccess(true);
+      setEmail("");
     } catch (err) {
       setSuccess(false);
       console.error(err);

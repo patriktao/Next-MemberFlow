@@ -41,7 +41,7 @@ const AuthForm = (props: Props) => {
           setErrorMessage("");
           setEmail("");
           setPassword("");
-          router.push("/");
+          router.push("/dashboard");
         })
         .catch((error) => {
           setErrorMessage(error.message);

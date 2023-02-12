@@ -1,12 +1,16 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { Container, Heading, Text } from "@chakra-ui/layout";
+import bg_color from "../styles/colors";
+import { NavProvider } from "./contexts/NavContext";
 
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider>
-      <Container maxW="container.lg" minH="container.sm">
-        <Component {...pageProps} />
-      </Container>
+      <NavProvider>
+        <Container maxW="100vw" minH="container.sm" background={bg_color}>
+          <Component {...pageProps} />
+        </Container>
+      </NavProvider>
     </ChakraProvider>
   );
 }

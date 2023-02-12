@@ -1,32 +1,33 @@
-import React, { ReactNode } from 'react'
-import Link from 'next/link'
-import Head from 'next/head'
+import React, { ReactNode } from "react";
+import Head from "next/head";
+import Sidebar from "./navbar/Sidebar";
+import { Box, Flex, Heading } from "@chakra-ui/react";
+import component_color from "../styles/colors";
 
 type Props = {
-  children?: ReactNode
-  title?: string
-}
+  children?: ReactNode;
+  title?: string;
+};
 
-const Layout = ({ children, title = 'This is the default title' }: Props) => (
-  <div>
+const Layout = ({ children, title = "This is the default title" }: Props) => (
+  <Flex columnGap="3rem">
     <Head>
       <title>{title}</title>
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Head>
-    <header>
-      <nav>
-        <Link href="/">Home</Link> | <Link href="/about">About</Link> |{' '}
-        <Link href="/users">Users List</Link> |{' '}
-        <a href="/api/users">Users API</a>
-      </nav>
-    </header>
-    {children}
-    <footer>
-      <hr />
-      <span>I'm here to stay (Footer)</span>
-    </footer>
-  </div>
-)
+    <Sidebar />
+    <Box
+      marginTop="2.5vh"
+      padding="2rem"
+      boxShadow="0 4px 12px 0 rgba(0, 0, 0, 0.05)"
+      borderRadius="30px"
+      backgroundColor={component_color}
+      width="100%"
+    >
+      {children}
+    </Box>
+  </Flex>
+);
 
-export default Layout
+export default Layout;

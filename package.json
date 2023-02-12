@@ -14,7 +14,9 @@
     "framer-motion": "^9.0.2",
     "next": "latest",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.7.1",
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
