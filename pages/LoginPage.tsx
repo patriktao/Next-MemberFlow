@@ -1,0 +1,32 @@
+import { Box, Center, Heading } from "@chakra-ui/react";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import AuthForm from "../components/auth/AuthForm";
+import PasswordRecoveryForm from "../components/passwordRecovery/passwordRecoveryForm";
+
+const LoginPage = () => {
+  return (
+    <Center minH="100vh">
+      <Box minW="container.sm" mx="auto" p="4">
+        <Heading as="h1" size="xl" mb="6">
+          Memberflow.
+        </Heading>
+        <Tabs>
+          <TabList>
+            <Tab>Login</Tab>
+            <Tab>Forgotten your password?</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <AuthForm />
+            </TabPanel>
+            <TabPanel>
+              <PasswordRecoveryForm />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Box>
+    </Center>
+  );
+};
+
+export default LoginPage;
