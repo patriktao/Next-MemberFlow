@@ -130,14 +130,14 @@ function Sidebar() {
           active={selectedNavItem === "/archived"}
           path="/archived"
         />
-        <NavItem
+        {/*  <NavItem
           navSize={navSize}
           icon={FiSettings}
           title="Settings"
           description={undefined}
           active={selectedNavItem === "/settings"}
           path="/settings"
-        />
+        /> */}
       </Flex>
 
       <Flex
@@ -165,7 +165,9 @@ function Sidebar() {
             </Flex>
           </MenuButton>
           <MenuList>
-            <MenuItem>Settings</MenuItem>
+            <MenuItem onClick={() => router.push("/settings")}>
+              Settings
+            </MenuItem>
             <MenuItem onClick={handleLogOut}>Logout</MenuItem>
           </MenuList>
         </Menu>
