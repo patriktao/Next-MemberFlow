@@ -1,7 +1,8 @@
 import { Heading } from "@chakra-ui/react";
+import withAuth from "../components/auth/withAuth";
 import Layout from "../components/Layout";
 
-const IndexPage = () => (
+const Dashboard = () => (
   <Layout title="Dashboard">
     <Heading as="h1" size="lg" paddingBottom="1rem">
       MemberFlow.
@@ -10,4 +11,4 @@ const IndexPage = () => (
   </Layout>
 );
 
-export default IndexPage;
+export default withAuth(Dashboard);

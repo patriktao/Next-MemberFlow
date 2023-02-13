@@ -1,11 +1,15 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import {
   Flex,
-  Text,
   IconButton,
   Divider,
   Avatar,
   Heading,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  useToast,
 } from "@chakra-ui/react";
 import { FiMenu, FiHome, FiCalendar, FiUser, FiSettings } from "react-icons/fi";
 import { IoPawOutline } from "react-icons/io5";
@@ -13,12 +17,16 @@ import NavItem from "./NavItem";
 import component_color from "../../styles/colors";
 import { useRouter } from "next/router";
 import { NavContext } from "../../pages/contexts/NavContext";
+import { ChevronRightIcon } from "@chakra-ui/icons";
+import { logOut } from "../../pages/api/authAPI/authAPI";
+import displayToast from "../ui_components/Toast";
 
 function Sidebar() {
   const { pathname } = useRouter();
   const context = useContext(NavContext);
   const { navSize, setNavSize, selectedNavItem, setSelectedNavItem } =
     useContext(NavContext);
+  const router = useRouter();
 
   if (!context) {
     throw new Error("CountContext is undefined");
@@ -46,6 +54,26 @@ function Sidebar() {
         break;
     }
   }
+
+  const toast = useToast();
+
+  const handleLogOut = async () =>
+    await logOut()
+      .then(() => {
+        displayToast({
+          toast: toast,
+          title: "Successfully logged out!",
+          status: "success",
+        });
+        router.push("/");
+      })
+      .catch((error) =>
+        displayToast({
+          toast: toast,
+          title: error.message,
+          status: "error",
+        })
+      );
 
   return (
     <Flex
@@ -119,20 +147,28 @@ function Sidebar() {
         alignItems={navSize == "small" ? "center" : "flex-start"}
         mb={4}
       >
-        <Divider display={navSize == "small" ? "none" : "flex"} />
-        <Flex mt={4} align="center">
-          <Avatar size="sm" src="avatar-1.jpg" />
-          <Flex
-            flexDir="column"
-            ml={4}
-            display={navSize == "small" ? "none" : "flex"}
-          >
-            <Heading as="h3" size="sm">
-              Sylwia Weller
-            </Heading>
-            <Text color="gray">Admin</Text>
-          </Flex>
-        </Flex>
+        <Menu>
+          <MenuButton>
+            <Divider display={navSize == "small" ? "none" : "flex"} />
+            <Flex mt={4} align="center">
+              <Avatar size="sm" src="avatar-1.jpg" />
+              <Flex
+                flexDir="column"
+                ml={4}
+                display={navSize == "small" ? "none" : "flex"}
+              >
+                <Heading as="h3" size="sm">
+                  Admin
+                  {<ChevronRightIcon marginLeft="4px" />}
+                </Heading>
+              </Flex>
+            </Flex>
+          </MenuButton>
+          <MenuList>
+            <MenuItem>Settings</MenuItem>
+            <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
     </Flex>
   );

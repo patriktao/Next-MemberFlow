@@ -3,7 +3,7 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import AuthForm from "../components/auth/AuthForm";
 import PasswordRecoveryForm from "../components/passwordRecovery/PasswordRecoveryForm";
 
-const LoginPage = () => {
+const Login = () => {
   return (
     <Center minH="100vh">
       <Box minW="container.sm" mx="auto" p="4">
@@ -29,4 +29,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login;

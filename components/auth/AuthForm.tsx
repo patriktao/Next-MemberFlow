@@ -5,29 +5,33 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Box,
   Button,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Input,
-  Link,
   Spinner,
   Stack,
+  useToast,
 } from "@chakra-ui/react";
 
-import { signIn } from "../../pages/api/authAPI/authAPI";
+import { logIn } from "../../pages/api/authAPI/authAPI";
+import displayToast from "../ui_components/Toast";
 
 type Props = {};
 
 const AuthForm = (props: Props) => {
+  /* States */
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setLoading] = useState(false);
-  const router = useRouter();
 
+  /* Function Retrieval */
+  const router = useRouter();
+  const toast = useToast();
+
+  /* Conditions */
   const emailError = email === "";
   const passwordError = password === "";
 
@@ -35,12 +39,17 @@ const AuthForm = (props: Props) => {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      signIn(email, password)
+      logIn(email, password)
         .then((user) => {
           console.log("Signed in as:", user);
           setErrorMessage("");
           setEmail("");
           setPassword("");
+          displayToast({
+            toast: toast,
+            title: "Successfully logged in!",
+            status: "success",
+          });
           router.push("/dashboard");
         })
         .catch((error) => {

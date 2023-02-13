@@ -1,5 +1,6 @@
 import { Heading } from "@chakra-ui/react";
 import React from "react";
+import withAuth from "../components/auth/withAuth";
 import Layout from "../components/Layout";
 
 type Props = {};
@@ -15,4 +16,4 @@ function archived({}: Props) {
   );
 }
 
-export default archived;
+export default withAuth(archived);
