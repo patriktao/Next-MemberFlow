@@ -8,12 +8,16 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  InputGroup,
+  InputLeftElement,
   Spinner,
   Stack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { userAuth } from "../../pages/api/firebase";
+import { EmailIcon } from "@chakra-ui/icons";
+import InputEmail from "../ui_components/InputEmail";
 
 type Props = {};
 
@@ -43,24 +47,13 @@ const PasswordRecoveryForm = (props: Props) => {
   return (
     <form onSubmit={handleSubmit}>
       <Stack spacing="4">
-        <FormControl id="email" isInvalid={Boolean(errorMessage)}>
-          <FormLabel>Email address</FormLabel>
-          <Input
-            placeholder="Enter your email..."
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrorMessage("");
-            }}
-            isRequired
-          />
-          {!emailError ? (
-            ""
-          ) : (
-            <FormErrorMessage> Email is required </FormErrorMessage>
-          )}
-        </FormControl>
+        <InputEmail
+          errorMessage={errorMessage}
+          setEmail={setEmail}
+          setErrorMessage={setErrorMessage}
+          emailError={emailError}
+          value={email}
+        ></InputEmail>
         {success && (
           <Alert status="success">
             <AlertIcon />

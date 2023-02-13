@@ -8,7 +8,7 @@ const Login = () => {
     <Center minH="100vh">
       <Box minW="container.sm" mx="auto" p="4">
         <Heading as="h1" size="xl" mb="6">
-          Memberflow.
+          memberflow.
         </Heading>
         <Tabs isFitted variant='soft-rounded'>
           <TabList>

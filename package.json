@@ -11,14 +11,19 @@
     "@chakra-ui/react": "^2.4.9",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@tanstack/react-table": "^8.7.9",
     "firebase": "^9.17.1",
     "framer-motion": "^9.0.2",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-focus-lock": "^2.9.3",
     "react-icons": "^4.7.1",
-    "styled-components": "^5.3.6"
+    "react-table": "^7.8.0",
+    "styled-components": "^5.3.6",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",
