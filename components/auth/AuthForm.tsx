@@ -5,8 +5,6 @@ import {
   AlertDescription,
   AlertIcon,
   AlertTitle,
-  Button,
-  Spinner,
   Stack,
   useToast,
 } from "@chakra-ui/react";
@@ -26,14 +24,13 @@ const AuthForm = (props: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setLoading] = useState(false);
 
-  /* Function Retrieval */
-  const router = useRouter();
-  const toast = useToast();
-
   /* Conditions */
   const emailError = email === "";
-
   const passwordError = password === "";
+
+  /* Functions */
+  const router = useRouter();
+  const toast = useToast();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -18,6 +18,8 @@ import {
   MenuList,
   ButtonGroup,
   useDisclosure,
+  Input,
+  FormControl,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -31,19 +33,20 @@ import {
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import type { DocumentData } from "firebase/firestore";
-import { getTimestamp } from "../../utils/date-utils";
 import { db } from "../../pages/api/firebase";
 import AddRequestModal from "../request/AddRequestModal";
+import requestTableColumns from "./RequestTableColumns";
 
 export function RequestTable() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const columnHelper = createColumnHelper<DocumentData>();
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [data, setData] = useState<DocumentData[]>([]);
   const prevData = useRef<DocumentData[]>([]);
+  const [tableData, setTableData] = useState<DocumentData[]>([]);
+  const [rowSelection, setRowSelection] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const unsub = async () =>
@@ -51,23 +54,25 @@ export function RequestTable() {
         let requests = prevData.current.map((x) => x);
         snapshot.docChanges().forEach((change) => {
           const personData = change.doc.data();
-          const personID = personData.id;
+          const personId = personData.requestId;
           switch (change.type) {
             case "added":
               if (
-                !requests.find((member: DocumentData) => member.id === personID)
+                !requests.find(
+                  (member: DocumentData) => member.requestId === personId
+                )
               ) {
                 requests.push(personData);
               }
               break;
             case "removed":
               requests = requests.filter(
-                (member: DocumentData) => member.id !== personID
+                (member: DocumentData) => member.requestId !== personId
               );
               break;
             case "modified":
               requests = requests.filter(
-                (member: DocumentData) => member.id !== personID
+                (member: DocumentData) => member.requestId !== personId
               );
               requests.push(personData);
               break;
@@ -77,94 +82,81 @@ export function RequestTable() {
         });
         prevData.current = requests;
         setData(prevData.current);
+        setTableData(prevData.current);
         console.log(prevData.current);
       });
 
     unsub();
   }, []);
 
-  const columns = [
-    columnHelper.accessor("name", {
-      cell: (info) => info.getValue(),
-      header: "Name",
-    }),
-    columnHelper.accessor("ssn", {
-      cell: (info) => info.getValue(),
-      header: "SSN",
-    }),
-    columnHelper.accessor("email", {
-      cell: (info) => info.getValue(),
-      header: "Email",
-      meta: {
-        isNumeric: true,
-      },
-    }),
-    columnHelper.accessor("gender", {
-      cell: (info) => info.getValue(),
-      header: "Gender",
-    }),
-    columnHelper.accessor("reg_date", {
-      cell: (info) => getTimestamp(info.getValue()),
-      header: "Reg Date",
-    }),
-    columnHelper.accessor("period", {
-      cell: (info) => info.getValue(),
-      header: "Period",
-    }),
-    columnHelper.accessor("afMember", {
-      cell: (info) => info.getValue(),
-      header: "AF Member?",
-    }),
-    columnHelper.accessor("payment_method", {
-      cell: (info) => info.getValue(),
-      header: "Payment Method",
-    }),
-    columnHelper.accessor("has_paid", {
-      cell: (info) => info.getValue(),
-      header: "Has Paid",
-    }),
-  ];
-
   const table = useReactTable({
-    columns,
-    data,
+    columns: requestTableColumns,
+    data: tableData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
+      rowSelection,
     },
+    enableRowSelection: true, //enable row selection for all rows
+    // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
+    onRowSelectionChange: setRowSelection,
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  function formatData(searchTerm: string) {
+    console.log(searchTerm);
+    let filteredData = data;
+    if (searchTerm.length !== 0) {
+      filteredData = data.filter(
+        (document: DocumentData) =>
+          document.name.toLowerCase().includes(searchTerm) ||
+          document.email.toLowerCase().includes(searchTerm) ||
+          document.ssn.toLowerCase().includes(searchTerm)
+      );
+    }
+    console.log(filteredData);
+    setTableData(filteredData);
+  }
 
   return (
     <Box>
       <Flex marginBottom={"8px"}>
         <Box>
           <Heading as="h3" size="md">
-            requests ({data.length})
+            requests ({tableData.length ?? 0})
           </Heading>
         </Box>
         <Spacer />
-        <ButtonGroup>
-          <Button colorScheme="teal" onClick={onOpen}>
-            add
-          </Button>
-          <AddRequestModal isOpen={isOpen} onClose={onClose} />
-          <Button isDisabled={true}>delete</Button>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              actions
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Import CSV</MenuItem>
-              <MenuItem>Export to CSV</MenuItem>
-            </MenuList>
-          </Menu>
-        </ButtonGroup>
+        <Flex columnGap={"0.5rem"}>
+          <Input
+            placeholder="search here..."
+            w="300px"
+            onChange={(e) => {
+              formatData(e.target.value.toLowerCase());
+            }}
+          />
+          <ButtonGroup>
+            <Button colorScheme="teal" onClick={onOpen}>
+              add
+            </Button>
+            <AddRequestModal isOpen={isOpen} onClose={onClose} />
+            <Button isDisabled={true}>delete</Button>
+            <Menu>
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                actions
+              </MenuButton>
+              <MenuList>
+                <MenuItem>Import CSV</MenuItem>
+                <MenuItem>Export to CSV</MenuItem>
+              </MenuList>
+            </Menu>
+          </ButtonGroup>
+        </Flex>
       </Flex>
-      <Table size="sm">
+      <Table size="md">
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>

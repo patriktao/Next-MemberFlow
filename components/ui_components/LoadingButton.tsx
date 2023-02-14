@@ -10,7 +10,6 @@ interface Props {
 }
 
 const LoadingButton = (props: Props) => {
-  console.log(props.children);
   return (
     <Button
       type="submit"

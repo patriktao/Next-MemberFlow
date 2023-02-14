@@ -87,6 +87,7 @@ function Sidebar() {
       flexDir="column"
       justifyContent="space-between"
       backgroundColor={component_color}
+      background="#FFFFFF"
     >
       <Flex
         p="5%"
@@ -149,8 +150,8 @@ function Sidebar() {
                 ml={4}
                 display={navSize == "small" ? "none" : "flex"}
               >
-                <Heading as="h3" size="sm">
-                  Admin
+                <Heading as="h3" size="sm" textAlign={"left"}>
+                  EASA Lund
                   {<ChevronRightIcon marginLeft="4px" />}
                 </Heading>
               </Flex>
