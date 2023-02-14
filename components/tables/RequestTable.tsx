@@ -21,6 +21,15 @@ import {
   Input,
   FormControl,
   Checkbox,
+  useToast,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  PopoverFooter,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -34,6 +43,7 @@ import {
   SortingState,
   getSortedRowModel,
   createColumnHelper,
+  Row,
 } from "@tanstack/react-table";
 import { HTMLProps, useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -42,6 +52,8 @@ import { db } from "../../pages/api/firebase";
 import AddRequestModal from "../request/AddRequestModal";
 import { hover_color } from "../../styles/colors";
 import { getTimestamp } from "../../utils/date-utils";
+import { deleteRequest } from "../../pages/api/requestAPI/requestAPI";
+import displayToast from "../ui_components/Toast";
 
 export function RequestTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -215,6 +227,67 @@ export function RequestTable() {
     setTableData(filteredData);
   }
 
+  const toast = useToast();
+
+  function handleDelete(selectedRows: Row<DocumentData>[]) {
+    const deletePromise = new Promise((resolve, reject) => {
+      selectedRows.flatMap((e) => {
+        setTimeout(() => {
+          deleteRequest(e.original.requestId)
+            .then(resolve)
+            .catch((error) => {
+              console.error(error);
+              reject();
+            });
+        }, 1000);
+      });
+    });
+
+    deletePromise
+      .then((result) => {
+        displayToast({
+          toast: toast,
+          title: "Successfully removed requests.",
+          status: "success",
+          position: "top-right",
+        });
+        table.resetRowSelection();
+      })
+      .catch((error) => {
+        console.error(error);
+        displayToast({
+          toast: toast,
+          title: "Error removing requests.",
+          status: "error",
+          position: "top-right",
+        });
+      });
+  }
+
+  const DeleteConfirmation = ({ children }) => {
+    return (
+      <Popover>
+        <PopoverTrigger>{children}</PopoverTrigger>
+        <PopoverContent>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverHeader>Confirmation</PopoverHeader>
+          <PopoverBody>
+            Are you sure you want to delete the following requests?
+          </PopoverBody>
+          <PopoverFooter border="0" textAlign={"right"} pb={4}>
+            <Button
+              colorScheme="red"
+              onClick={() => handleDelete(selectedRows)}
+            >
+              delete requests
+            </Button>
+          </PopoverFooter>
+        </PopoverContent>
+      </Popover>
+    );
+  };
+
   /* Render */
   return (
     <Box>
@@ -238,13 +311,11 @@ export function RequestTable() {
               add
             </Button>
             <AddRequestModal isOpen={isOpen} onClose={onClose} />
-            <Button
-              colorScheme="red"
-              isDisabled={!isDeletable}
-              onClick={() => console.info(table.getSelectedRowModel().flatRows)}
-            >
-              delete
-            </Button>
+            <DeleteConfirmation>
+              <Button isDisabled={!isDeletable} variant="outline">
+                delete
+              </Button>
+            </DeleteConfirmation>
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                 actions

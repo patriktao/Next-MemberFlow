@@ -1,4 +1,10 @@
-import { collection, Timestamp, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  Timestamp,
+  setDoc,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { v4 } from "uuid";
 
@@ -14,10 +20,10 @@ interface RequestForm {
   payMethod: string;
 }
 
-export default async function createNewRequest(form: RequestForm) {
+export async function createNewRequest(form: RequestForm) {
   try {
     console.log(form);
-    const uid = v4(); //Creates a primary key
+    const uid = v4();
     return await setDoc(doc(requestCollection, uid), {
       requestId: uid,
       reg_date: Timestamp.now(),
@@ -30,6 +36,14 @@ export default async function createNewRequest(form: RequestForm) {
       payMethod: form.payMethod,
       afMember: form.afMember,
     });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function deleteRequest(requestId: string) {
+  try {
+    return await deleteDoc(doc(requestCollection, requestId));
   } catch (error) {
     console.error(error);
   }

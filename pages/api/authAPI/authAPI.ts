@@ -7,7 +7,7 @@ export const logIn = async (email: string, password: string) => {
 
     let timeoutId = setTimeout(() => {
       reject(new Error("Sign-in timed out"));
-    }, 3000);
+    }, 1000);
 
     signInAttempt
       .then((user) => {

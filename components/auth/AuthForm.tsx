@@ -35,26 +35,25 @@ const AuthForm = (props: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      logIn(email, password)
-        .then((user) => {
-          console.log("Signed in as:", user);
-          setErrorMessage("");
-          setEmail("");
-          setPassword("");
-          displayToast({
-            toast: toast,
-            title: "Successfully logged in!",
-            status: "success",
-          });
-          router.push("/dashboard");
-        })
-        .catch((error) => {
-          setErrorMessage(error.message);
-          console.error("Error signing in:", error);
+    logIn(email, password)
+      .then((user) => {
+        console.log("Signed in as:", user);
+        setErrorMessage("");
+        setEmail("");
+        setPassword("");
+        displayToast({
+          toast: toast,
+          title: "Successfully logged in.",
+          status: "success",
         });
-      setLoading(false);
-    }, 1000);
+        router.push("/dashboard");
+        setLoading(false);
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+        console.error("Error signing in:", error);
+        setLoading(false);
+      });
   };
 
   return (

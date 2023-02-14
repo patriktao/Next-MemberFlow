@@ -26,7 +26,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import createNewRequest from "../../pages/api/requestAPI/requestAPI";
+import { createNewRequest } from "../../pages/api/requestAPI/requestAPI";
 import InputEmail from "../ui_components/InputEmail";
 import LoadingButton from "../ui_components/LoadingButton";
 import displayToast from "../ui_components/Toast";
@@ -89,6 +89,7 @@ const AddRequestForm = ({ onCancel }) => {
       payMethod: payMethod,
       period: period,
     };
+
     setTimeout(() => {
       createNewRequest(requestForm)
         .then(() => {
@@ -97,6 +98,7 @@ const AddRequestForm = ({ onCancel }) => {
             toast: toast,
             title: "Successfully added a new request.",
             status: "success",
+            position: "right-top",
           });
           onCancel();
           resetForm();
@@ -110,12 +112,12 @@ const AddRequestForm = ({ onCancel }) => {
             status: "error",
           });
         });
-    }, 3000);
+    }, 1000);
   };
 
   /* Components */
   const DataModal = (
-    <Modal size="3xl" isOpen={isOpen} onClose={onClose}>
+    <Modal size="2xl" isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Storing of your information!</ModalHeader>

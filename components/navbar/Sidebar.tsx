@@ -61,7 +61,7 @@ function Sidebar() {
       .then(() => {
         displayToast({
           toast: toast,
-          title: "Successfully logged out!",
+          title: "Successfully logged out.",
           status: "success",
         });
         router.push("/");

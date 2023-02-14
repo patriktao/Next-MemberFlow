@@ -6,6 +6,7 @@ interface ToastProps {
   status: "info" | "warning" | "success" | "error" | "loading";
   duration?: number;
   toast: Function;
+  position?: string;
 }
 
 const displayToast = (props: ToastProps) => {
@@ -14,9 +15,9 @@ const displayToast = (props: ToastProps) => {
     title: props.title,
     description: props.description,
     status: props.status,
-    duration: props.duration | 3500,
+    duration: props.duration | 4000,
     isClosable: true,
-    position: 'top',
+    position: props.position ?? "bottom",
   });
 };
 
