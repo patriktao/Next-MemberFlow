@@ -16,7 +16,8 @@ const AddRequestModal = ({ isOpen, onClose }) => {
         closeOnOverlayClick={false}
         isOpen={isOpen}
         onClose={onClose}
-        size="3xl"
+        size="4xl"
+        scrollBehavior="inside"
       >
         <ModalOverlay />
         <ModalContent>

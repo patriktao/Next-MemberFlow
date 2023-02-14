@@ -19,7 +19,6 @@ import {
   ButtonGroup,
   useDisclosure,
   Input,
-  FormControl,
   Checkbox,
   useToast,
   Popover,
@@ -54,6 +53,7 @@ import { hover_color } from "../../styles/colors";
 import { getTimestamp } from "../../utils/date-utils";
 import { deleteRequest } from "../../pages/api/requestAPI/requestAPI";
 import displayToast from "../ui_components/Toast";
+import Spinner from "../ui_components/Spinner";
 
 export function RequestTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -61,6 +61,7 @@ export function RequestTable() {
   const prevData = useRef<DocumentData[]>([]);
   const [tableData, setTableData] = useState<DocumentData[]>([]);
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
+  const [isDeleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const unsub = async () =>
@@ -97,13 +98,44 @@ export function RequestTable() {
         prevData.current = requests;
         setData(prevData.current);
         setTableData(prevData.current);
-        console.log(prevData.current);
       });
 
     unsub();
   }, []);
 
   /* Components */
+
+  const DeleteConfirmation = ({ children }) => {
+    return (
+      <Popover closeOnBlur={false}>
+        <PopoverTrigger>{children}</PopoverTrigger>
+        <PopoverContent>
+          <PopoverArrow />
+          <PopoverCloseButton />
+          <PopoverHeader pt={4} fontWeight="bold" border="0">
+            Delete selected requests
+          </PopoverHeader>
+          <PopoverArrow />
+          <PopoverBody>
+            Are you sure you want to delete the following selected requests?
+          </PopoverBody>
+          <PopoverFooter border="0" textAlign={"right"} pb={4}>
+            <Button
+              color="red"
+              background="red.100"
+              _hover={{ background: "red.50" }}
+              onClick={() => {
+                handleDelete(selectedRows);
+              }}
+            >
+              delete
+            </Button>
+          </PopoverFooter>
+        </PopoverContent>
+      </Popover>
+    );
+  };
+
   const columnHelper = createColumnHelper<DocumentData>();
 
   const requestTableColumns = [
@@ -231,6 +263,7 @@ export function RequestTable() {
 
   function handleDelete(selectedRows: Row<DocumentData>[]) {
     const deletePromise = new Promise((resolve, reject) => {
+      setDeleting(true);
       selectedRows.flatMap((e) => {
         setTimeout(() => {
           deleteRequest(e.original.requestId)
@@ -242,7 +275,6 @@ export function RequestTable() {
         }, 1000);
       });
     });
-
     deletePromise
       .then((result) => {
         displayToast({
@@ -252,6 +284,7 @@ export function RequestTable() {
           position: "top-right",
         });
         table.resetRowSelection();
+        setDeleting(false);
       })
       .catch((error) => {
         console.error(error);
@@ -261,32 +294,9 @@ export function RequestTable() {
           status: "error",
           position: "top-right",
         });
+        setDeleting(false);
       });
   }
-
-  const DeleteConfirmation = ({ children }) => {
-    return (
-      <Popover>
-        <PopoverTrigger>{children}</PopoverTrigger>
-        <PopoverContent>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <PopoverHeader>Confirmation</PopoverHeader>
-          <PopoverBody>
-            Are you sure you want to delete the following requests?
-          </PopoverBody>
-          <PopoverFooter border="0" textAlign={"right"} pb={4}>
-            <Button
-              colorScheme="red"
-              onClick={() => handleDelete(selectedRows)}
-            >
-              delete requests
-            </Button>
-          </PopoverFooter>
-        </PopoverContent>
-      </Popover>
-    );
-  };
 
   /* Render */
   return (
@@ -312,7 +322,13 @@ export function RequestTable() {
             </Button>
             <AddRequestModal isOpen={isOpen} onClose={onClose} />
             <DeleteConfirmation>
-              <Button isDisabled={!isDeletable} variant="outline">
+              <Button
+                isDisabled={!isDeletable}
+                variant="outline"
+                borderColor={isDeleting ? "red" : "gray"}
+                isLoading={isDeleting}
+                spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
+              >
                 delete
               </Button>
             </DeleteConfirmation>

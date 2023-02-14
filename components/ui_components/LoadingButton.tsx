@@ -7,17 +7,21 @@ interface Props {
   isDisabled?: boolean;
   color?: string;
   children?: ReactNode;
+  onClick?: any | undefined;
+  variant?: string;
 }
 
 const LoadingButton = (props: Props) => {
   return (
     <Button
       type="submit"
+      onClick={() => props.onClick || ""}
       colorScheme={props.color || "blue"}
       isDisabled={props.isDisabled || false}
-      size={props.size || "md"}
+      size={props.size ?? "md"}
       isLoading={props.isLoading}
       spinnerPlacement={"start"}
+      variant={props.variant || "solid"}
       spinner={
         <Spinner
           style={{ marginLeft: "0.5rem" }}
