@@ -20,6 +20,7 @@ import {
   useDisclosure,
   Input,
   FormControl,
+  Checkbox,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -32,21 +33,22 @@ import {
   getCoreRowModel,
   SortingState,
   getSortedRowModel,
+  createColumnHelper,
 } from "@tanstack/react-table";
-import { useEffect, useRef, useState } from "react";
+import { HTMLProps, useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import type { DocumentData } from "firebase/firestore";
 import { db } from "../../pages/api/firebase";
 import AddRequestModal from "../request/AddRequestModal";
-import requestTableColumns from "./RequestTableColumns";
+import { hover_color } from "../../styles/colors";
+import { getTimestamp } from "../../utils/date-utils";
 
 export function RequestTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [data, setData] = useState<DocumentData[]>([]);
   const prevData = useRef<DocumentData[]>([]);
   const [tableData, setTableData] = useState<DocumentData[]>([]);
-  const [rowSelection, setRowSelection] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
+  const [rowSelection, setRowSelection] = useState<DocumentData>([]);
 
   useEffect(() => {
     const unsub = async () =>
@@ -89,6 +91,75 @@ export function RequestTable() {
     unsub();
   }, []);
 
+  /* Components */
+  const columnHelper = createColumnHelper<DocumentData>();
+
+  const requestTableColumns = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <IndeterminateCheckbox
+          {...{
+            checked: table.getIsAllRowsSelected(),
+            indeterminate: table.getIsSomeRowsSelected(),
+            onChange: table.getToggleAllRowsSelectedHandler(),
+          }}
+        />
+      ),
+      cell: ({ row }) => (
+        <div className="px-1">
+          <IndeterminateCheckbox
+            {...{
+              checked: row.getIsSelected(),
+              disabled: !row.getCanSelect(),
+              indeterminate: row.getIsSomeSelected(),
+              onChange: row.getToggleSelectedHandler(),
+            }}
+          />
+        </div>
+      ),
+    },
+    columnHelper.accessor("name", {
+      cell: (info) => info.getValue(),
+      header: "Name",
+    }),
+    columnHelper.accessor("email", {
+      cell: (info) => info.getValue(),
+      header: "Email",
+      meta: {
+        isNumeric: true,
+      },
+    }),
+    columnHelper.accessor("ssn", {
+      cell: (info) => info.getValue(),
+      header: "SSN",
+    }),
+    columnHelper.accessor("gender", {
+      cell: (info) => info.getValue(),
+      header: "Gender",
+    }),
+    columnHelper.accessor("reg_date", {
+      cell: (info) => getTimestamp(info.getValue()),
+      header: "Reg Date",
+    }),
+    columnHelper.accessor("period", {
+      cell: (info) => info.getValue(),
+      header: "Period",
+    }),
+    columnHelper.accessor("afMember", {
+      cell: (info) => info.getValue(),
+      header: "AF Member?",
+    }),
+    columnHelper.accessor("payMethod", {
+      cell: (info) => info.getValue(),
+      header: "Payment Method",
+    }),
+    columnHelper.accessor("hasPaid", {
+      cell: (info) => info.getValue(),
+      header: "Has Paid",
+    }),
+  ];
+
   const table = useReactTable({
     columns: requestTableColumns,
     data: tableData,
@@ -104,10 +175,34 @@ export function RequestTable() {
     onRowSelectionChange: setRowSelection,
   });
 
+  const IndeterminateCheckbox = ({
+    indeterminate,
+    className = "",
+    ...rest
+  }: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) => {
+    const ref = React.useRef<HTMLInputElement>(null!);
+
+    useEffect(() => {
+      if (typeof indeterminate === "boolean") {
+        ref.current.indeterminate = !rest.checked && indeterminate;
+      }
+    }, [ref, indeterminate]);
+
+    return (
+      <Box>
+        <Checkbox ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
+      </Box>
+    );
+  };
+
+  /* Conditions */
+  const selectedRows = table.getSelectedRowModel().flatRows;
+  const isDeletable = selectedRows.length > 0;
+
+  /* Functions */
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   function formatData(searchTerm: string) {
-    console.log(searchTerm);
     let filteredData = data;
     if (searchTerm.length !== 0) {
       filteredData = data.filter(
@@ -117,10 +212,10 @@ export function RequestTable() {
           document.ssn.toLowerCase().includes(searchTerm)
       );
     }
-    console.log(filteredData);
     setTableData(filteredData);
   }
 
+  /* Render */
   return (
     <Box>
       <Flex marginBottom={"8px"}>
@@ -143,7 +238,13 @@ export function RequestTable() {
               add
             </Button>
             <AddRequestModal isOpen={isOpen} onClose={onClose} />
-            <Button isDisabled={true}>delete</Button>
+            <Button
+              colorScheme="red"
+              isDisabled={!isDeletable}
+              onClick={() => console.info(table.getSelectedRowModel().flatRows)}
+            >
+              delete
+            </Button>
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                 actions
@@ -173,7 +274,6 @@ export function RequestTable() {
                       header.column.columnDef.header,
                       header.getContext()
                     )}
-
                     <chakra.span pl="4">
                       {header.column.getIsSorted() ? (
                         header.column.getIsSorted() === "desc" ? (
@@ -191,7 +291,7 @@ export function RequestTable() {
         </Thead>
         <Tbody>
           {table.getRowModel().rows.map((row) => (
-            <Tr key={row.id}>
+            <Tr key={row.id} _hover={{ background: hover_color }}>
               {row.getVisibleCells().map((cell) => {
                 // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = cell.column.columnDef.meta;

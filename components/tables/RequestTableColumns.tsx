@@ -1,30 +1,10 @@
-import { Box, Checkbox } from "@chakra-ui/react";
 import { createColumnHelper } from "@tanstack/react-table";
 import type { DocumentData } from "firebase/firestore";
-import React, { HTMLProps, useEffect } from "react";
+import React from "react";
 import { getTimestamp } from "../../utils/date-utils";
+import Indetermine
 
 const columnHelper = createColumnHelper<DocumentData>();
-
-function IndeterminateCheckbox({
-  indeterminate,
-  className = "",
-  ...rest
-}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
-  const ref = React.useRef<HTMLInputElement>(null!);
-
-  useEffect(() => {
-    if (typeof indeterminate === "boolean") {
-      ref.current.indeterminate = !rest.checked && indeterminate;
-    }
-  }, [ref, indeterminate]);
-
-  return (
-    <Box>
-      <Checkbox ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
-    </Box>
-  );
-}
 
 const requestTableColumns = [
   {

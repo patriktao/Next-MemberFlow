@@ -103,6 +103,12 @@ const AddRequestForm = ({ onCancel }) => {
         })
         .catch((error) => {
           setErrorMessage(error.message);
+          displayToast({
+            toast: toast,
+            title: "Error adding a new request.",
+            description: error.message,
+            status: "error",
+          });
         });
     }, 3000);
   };
