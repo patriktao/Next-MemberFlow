@@ -12,6 +12,7 @@ import {
   Flex,
   Button,
   Spacer,
+  Text,
   Menu,
   MenuButton,
   MenuItem,
@@ -29,6 +30,7 @@ import {
   PopoverHeader,
   PopoverTrigger,
   PopoverFooter,
+  Tfoot,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -150,8 +152,6 @@ export function RequestTable() {
               onChange: table.getToggleAllRowsSelectedHandler(),
             }}
           />
-          <Spacer />
-          selected: {table.getSelectedRowModel().flatRows.length}
         </Box>
       ),
       cell: ({ row }) => (
@@ -351,7 +351,6 @@ export function RequestTable() {
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = header.column.columnDef.meta;
                 return (
                   <Th
@@ -393,6 +392,11 @@ export function RequestTable() {
             </Tr>
           ))}
         </Tbody>
+        <Tfoot>
+          <Tr>
+            <Th colSpan={10}>Selected: {selectedRows.length}</Th>
+          </Tr>
+        </Tfoot>
       </Table>
     </Box>
   );
