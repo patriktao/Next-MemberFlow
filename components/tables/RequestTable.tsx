@@ -12,7 +12,6 @@ import {
   Flex,
   Button,
   Spacer,
-  Text,
   Menu,
   MenuButton,
   MenuItem,
@@ -20,16 +19,7 @@ import {
   ButtonGroup,
   useDisclosure,
   Input,
-  Checkbox,
   useToast,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
-  PopoverFooter,
   Tfoot,
 } from "@chakra-ui/react";
 import {
@@ -43,19 +33,20 @@ import {
   getCoreRowModel,
   SortingState,
   getSortedRowModel,
-  createColumnHelper,
   Row,
 } from "@tanstack/react-table";
-import { HTMLProps, useEffect, useRef, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
 import type { DocumentData } from "firebase/firestore";
-import { db } from "../../pages/api/firebase";
 import AddRequestModal from "../request/AddRequestModal";
 import { hover_color } from "../../styles/colors";
-import { getTimestamp } from "../../utils/date-utils";
-import { deleteRequest } from "../../pages/api/requestAPI/requestAPI";
+import {
+  deleteRequest,
+  fetchRequests,
+} from "../../pages/api/requestAPI/requestAPI";
 import displayToast from "../ui_components/Toast";
 import Spinner from "../ui_components/Spinner";
+import RequestTableColumns from "./RequestTableColumns";
+import DeleteRowPopover from "./DeleteRowPopover";
 
 export function RequestTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -66,148 +57,18 @@ export function RequestTable() {
   const [isDeleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const unsub = async () =>
-      await onSnapshot(collection(db, "requests"), (snapshot) => {
-        let requests = prevData.current.map((x) => x);
-        snapshot.docChanges().forEach((change) => {
-          const personData = change.doc.data();
-          const personId = personData.requestId;
-          switch (change.type) {
-            case "added":
-              if (
-                !requests.find(
-                  (member: DocumentData) => member.requestId === personId
-                )
-              ) {
-                requests.push(personData);
-              }
-              break;
-            case "removed":
-              requests = requests.filter(
-                (member: DocumentData) => member.requestId !== personId
-              );
-              break;
-            case "modified":
-              requests = requests.filter(
-                (member: DocumentData) => member.requestId !== personId
-              );
-              requests.push(personData);
-              break;
-            default:
-              break;
-          }
-        });
-        prevData.current = requests;
+    const unsub = async () => {
+      await fetchRequests(prevData).then((res) => {
+        prevData.current = res;
         setData(prevData.current);
         setTableData(prevData.current);
       });
-
+    };
     unsub();
   }, []);
 
-  /* Components */
-
-  const DeleteConfirmation = ({ children }) => {
-    return (
-      <Popover closeOnBlur={false}>
-        <PopoverTrigger>{children}</PopoverTrigger>
-        <PopoverContent>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <PopoverHeader pt={4} fontWeight="bold" border="0">
-            Delete selected requests
-          </PopoverHeader>
-          <PopoverArrow />
-          <PopoverBody>
-            Are you sure you want to delete the following selected requests?
-          </PopoverBody>
-          <PopoverFooter border="0" textAlign={"right"} pb={4}>
-            <Button
-              color="red"
-              background="red.100"
-              _hover={{ background: "red.50" }}
-              onClick={() => {
-                handleDelete(selectedRows);
-              }}
-            >
-              delete
-            </Button>
-          </PopoverFooter>
-        </PopoverContent>
-      </Popover>
-    );
-  };
-
-  const columnHelper = createColumnHelper<DocumentData>();
-
-  const requestTableColumns = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Box display="flex">
-          <IndeterminateCheckbox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler(),
-            }}
-          />
-        </Box>
-      ),
-      cell: ({ row }) => (
-        <IndeterminateCheckbox
-          {...{
-            checked: row.getIsSelected(),
-            disabled: !row.getCanSelect(),
-            indeterminate: row.getIsSomeSelected(),
-            onChange: row.getToggleSelectedHandler(),
-          }}
-        />
-      ),
-    },
-    columnHelper.accessor("name", {
-      cell: (info) => info.getValue(),
-      header: "Name",
-    }),
-    columnHelper.accessor("email", {
-      cell: (info) => info.getValue(),
-      header: "Email",
-      meta: {
-        isNumeric: true,
-      },
-    }),
-    columnHelper.accessor("ssn", {
-      cell: (info) => info.getValue(),
-      header: "SSN",
-    }),
-    columnHelper.accessor("gender", {
-      cell: (info) => info.getValue(),
-      header: "Gender",
-    }),
-    columnHelper.accessor("reg_date", {
-      cell: (info) => getTimestamp(info.getValue()),
-      header: "Reg Date",
-    }),
-    columnHelper.accessor("period", {
-      cell: (info) => info.getValue(),
-      header: "Period",
-    }),
-    columnHelper.accessor("afMember", {
-      cell: (info) => info.getValue(),
-      header: "AF Member?",
-    }),
-    columnHelper.accessor("payMethod", {
-      cell: (info) => info.getValue(),
-      header: "Payment Method",
-    }),
-    columnHelper.accessor("hasPaid", {
-      cell: (info) => info.getValue(),
-      header: "Has Paid",
-    }),
-  ];
-
   const table = useReactTable({
-    columns: requestTableColumns,
+    columns: RequestTableColumns,
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -221,29 +82,10 @@ export function RequestTable() {
     onRowSelectionChange: setRowSelection,
   });
 
-  const IndeterminateCheckbox = ({
-    indeterminate,
-    className = "",
-    ...rest
-  }: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) => {
-    const ref = React.useRef<HTMLInputElement>(null!);
-
-    useEffect(() => {
-      if (typeof indeterminate === "boolean") {
-        ref.current.indeterminate = !rest.checked && indeterminate;
-      }
-    }, [ref, indeterminate]);
-
-    return (
-      <Box display="grid">
-        <Checkbox ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
-      </Box>
-    );
-  };
-
   /* Conditions */
-  const selectedRows = table.getSelectedRowModel().flatRows;
-  const isDeletable = selectedRows.length > 0;
+  const selectedRows: Row<DocumentData>[] =
+    table.getSelectedRowModel().flatRows;
+  const isDeletable: boolean = selectedRows.length > 0;
 
   /* Functions */
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -300,7 +142,6 @@ export function RequestTable() {
       });
   }
 
-  /* Render */
   return (
     <Box>
       <Flex marginBottom={"8px"}>
@@ -323,17 +164,14 @@ export function RequestTable() {
               add
             </Button>
             <AddRequestModal isOpen={isOpen} onClose={onClose} />
-            <DeleteConfirmation>
-              <Button
-                isDisabled={!isDeletable}
-                variant="outline"
-                borderColor={isDeleting ? "red" : "gray"}
-                isLoading={isDeleting}
-                spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
-              >
-                delete
-              </Button>
-            </DeleteConfirmation>
+            <DeleteRowPopover
+              selectedRows={selectedRows}
+              handleDelete={handleDelete}
+              isDisabled={!isDeletable}
+              isLoading={isDeleting}
+            >
+              delete
+            </DeleteRowPopover>
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                 actions
