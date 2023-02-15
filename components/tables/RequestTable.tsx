@@ -142,25 +142,27 @@ export function RequestTable() {
     {
       id: "select",
       header: ({ table }) => (
-        <IndeterminateCheckbox
-          {...{
-            checked: table.getIsAllRowsSelected(),
-            indeterminate: table.getIsSomeRowsSelected(),
-            onChange: table.getToggleAllRowsSelectedHandler(),
-          }}
-        />
-      ),
-      cell: ({ row }) => (
-        <div className="px-1">
+        <Box display="flex">
           <IndeterminateCheckbox
             {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler(),
+              checked: table.getIsAllRowsSelected(),
+              indeterminate: table.getIsSomeRowsSelected(),
+              onChange: table.getToggleAllRowsSelectedHandler(),
             }}
           />
-        </div>
+          <Spacer />
+          selected: {table.getSelectedRowModel().flatRows.length}
+        </Box>
+      ),
+      cell: ({ row }) => (
+        <IndeterminateCheckbox
+          {...{
+            checked: row.getIsSelected(),
+            disabled: !row.getCanSelect(),
+            indeterminate: row.getIsSomeSelected(),
+            onChange: row.getToggleSelectedHandler(),
+          }}
+        />
       ),
     },
     columnHelper.accessor("name", {
@@ -233,7 +235,7 @@ export function RequestTable() {
     }, [ref, indeterminate]);
 
     return (
-      <Box>
+      <Box display="grid">
         <Checkbox ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
       </Box>
     );
@@ -361,7 +363,7 @@ export function RequestTable() {
                       header.column.columnDef.header,
                       header.getContext()
                     )}
-                    <chakra.span pl="4">
+                    <chakra.span pl="0">
                       {header.column.getIsSorted() ? (
                         header.column.getIsSorted() === "desc" ? (
                           <TriangleDownIcon aria-label="sorted descending" />
