@@ -24,7 +24,7 @@ interface RequestForm {
 
 export async function fetchRequests(
   prevData: React.MutableRefObject<DocumentData[]>
-) {
+): Promise<DocumentData[]> {
   try {
     let requests = prevData.current.map((x) => x);
     await onSnapshot(collection(db, "requests"), (snapshot) => {
@@ -63,7 +63,7 @@ export async function fetchRequests(
   }
 }
 
-export async function createNewRequest(form: RequestForm) {
+export async function createNewRequest(form: RequestForm): Promise<void> {
   try {
     console.log(form);
     const uid = v4();
@@ -84,7 +84,7 @@ export async function createNewRequest(form: RequestForm) {
   }
 }
 
-export async function deleteRequest(requestId: string) {
+export async function deleteRequest(requestId: string): Promise<void> {
   try {
     return await deleteDoc(doc(requestCollection, requestId));
   } catch (error) {

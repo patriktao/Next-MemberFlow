@@ -21,13 +21,16 @@ type Props = {
   isDisabled: boolean;
   isLoading: boolean;
   variant?: string;
+  isOpen: boolean;
+  setOpen: Function;
 };
 
 function DeleteRowPopover(props: Props) {
   return (
-    <Popover closeOnBlur={false}>
+    <Popover isOpen={props.isOpen}>
       <PopoverTrigger>
         <Button
+          onClick={() => props.setOpen(!props.isOpen)}
           isDisabled={props.isDisabled}
           variant={props.variant ?? "outline"}
           borderColor={props.isLoading ? "red" : "gray"}
@@ -39,7 +42,7 @@ function DeleteRowPopover(props: Props) {
       </PopoverTrigger>
       <PopoverContent>
         <PopoverArrow />
-        <PopoverCloseButton />
+        <PopoverCloseButton onClick={() => props.setOpen(!props.isOpen)} />
         <PopoverHeader pt={4} fontWeight="bold" border="0">
           Delete selected requests
         </PopoverHeader>
@@ -53,6 +56,7 @@ function DeleteRowPopover(props: Props) {
             background="red.100"
             _hover={{ background: "red.50" }}
             onClick={() => {
+              props.setOpen(false);
               props.handleDelete(props.selectedRows);
             }}
           >

@@ -112,7 +112,7 @@ const AddRequestForm = ({ onCancel }) => {
             status: "error",
           });
         });
-    }, 1000);
+    }, 500);
   };
 
   /* Components */

@@ -36,7 +36,7 @@ import {
   Row,
 } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
-import type { DocumentData } from "firebase/firestore";
+import { collection, DocumentData, onSnapshot } from "firebase/firestore";
 import AddRequestModal from "../request/AddRequestModal";
 import { hover_color } from "../../styles/colors";
 import {
@@ -44,9 +44,9 @@ import {
   fetchRequests,
 } from "../../pages/api/requestAPI/requestAPI";
 import displayToast from "../ui_components/Toast";
-import Spinner from "../ui_components/Spinner";
 import RequestTableColumns from "./RequestTableColumns";
 import DeleteRowPopover from "./DeleteRowPopover";
+import { db } from "../../pages/api/firebase";
 
 export function RequestTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -57,13 +57,41 @@ export function RequestTable() {
   const [isDeleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const unsub = async () => {
-      await fetchRequests(prevData).then((res) => {
-        prevData.current = res;
+    const unsub = async () =>
+      await onSnapshot(collection(db, "requests"), (snapshot) => {
+        let requests = prevData.current.map((x) => x);
+        snapshot.docChanges().forEach((change) => {
+          const personData = change.doc.data();
+          const personId = personData.requestId;
+          switch (change.type) {
+            case "added":
+              if (
+                !requests.find(
+                  (member: DocumentData) => member.requestId === personId
+                )
+              ) {
+                requests.push(personData);
+              }
+              break;
+            case "removed":
+              requests = requests.filter(
+                (member: DocumentData) => member.requestId !== personId
+              );
+              break;
+            case "modified":
+              requests = requests.filter(
+                (member: DocumentData) => member.requestId !== personId
+              );
+              requests.push(personData);
+              break;
+            default:
+              break;
+          }
+        });
+        prevData.current = requests;
         setData(prevData.current);
         setTableData(prevData.current);
       });
-    };
     unsub();
   }, []);
 
@@ -89,8 +117,9 @@ export function RequestTable() {
 
   /* Functions */
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
 
-  function formatData(searchTerm: string) {
+  function formatData(searchTerm: string): void {
     let filteredData = data;
     if (searchTerm.length !== 0) {
       filteredData = data.filter(
@@ -105,7 +134,7 @@ export function RequestTable() {
 
   const toast = useToast();
 
-  function handleDelete(selectedRows: Row<DocumentData>[]) {
+  function handleDelete(selectedRows: Row<DocumentData>[]): void {
     const deletePromise = new Promise((resolve, reject) => {
       setDeleting(true);
       selectedRows.flatMap((e) => {
@@ -114,13 +143,15 @@ export function RequestTable() {
             .then(resolve)
             .catch((error) => {
               console.error(error);
+              setDeleting(false);
               reject();
             });
         }, 1000);
       });
     });
+
     deletePromise
-      .then((result) => {
+      .then(() => {
         displayToast({
           toast: toast,
           title: "Successfully removed requests.",
@@ -169,6 +200,8 @@ export function RequestTable() {
               handleDelete={handleDelete}
               isDisabled={!isDeletable}
               isLoading={isDeleting}
+              isOpen={isPopoverOpen}
+              setOpen={setPopoverOpen}
             >
               delete
             </DeleteRowPopover>
@@ -219,7 +252,6 @@ export function RequestTable() {
           {table.getRowModel().rows.map((row) => (
             <Tr key={row.id} _hover={{ background: hover_color }}>
               {row.getVisibleCells().map((cell) => {
-                // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = cell.column.columnDef.meta;
                 return (
                   <Td key={cell.id} isNumeric={meta?.isNumeric}>
