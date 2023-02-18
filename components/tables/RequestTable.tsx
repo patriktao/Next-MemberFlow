@@ -35,7 +35,7 @@ import {
   getSortedRowModel,
   Row,
 } from "@tanstack/react-table";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
 import AddRequestModal from "../request/AddRequestModal";
 import { hover_color } from "../../styles/colors";
@@ -48,7 +48,7 @@ import RequestTableColumns from "./RequestTableColumns";
 import DeleteRowPopover from "./DeleteRowPopover";
 import { db } from "../../pages/api/firebase";
 
-export function RequestTable() {
+const RequestTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [data, setData] = useState<DocumentData[]>([]);
   const prevData = useRef<DocumentData[]>([]);
@@ -56,44 +56,60 @@ export function RequestTable() {
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
   const [isDeleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    const unsub = async () =>
+  const unsub = useCallback(async (isMounting) => {
+    if (isMounting) {
       await onSnapshot(collection(db, "requests"), (snapshot) => {
         let requests = prevData.current.map((x) => x);
-        snapshot.docChanges().forEach((change) => {
-          const personData = change.doc.data();
-          const personId = personData.requestId;
-          switch (change.type) {
-            case "added":
-              if (
-                !requests.find(
-                  (member: DocumentData) => member.requestId === personId
-                )
-              ) {
+        snapshot.docChanges().forEach(
+          (change) => {
+            const personData = change.doc.data();
+            const personId = personData.requestId;
+            switch (change.type) {
+              case "added":
+                if (
+                  !requests.find(
+                    (member: DocumentData) => member.requestId === personId
+                  )
+                ) {
+                  requests.push(personData);
+                }
+                break;
+              case "removed":
+                requests = requests.filter(
+                  (member: DocumentData) => member.requestId !== personId
+                );
+                break;
+              case "modified":
+                requests = requests.filter(
+                  (member: DocumentData) => member.requestId !== personId
+                );
                 requests.push(personData);
-              }
-              break;
-            case "removed":
-              requests = requests.filter(
-                (member: DocumentData) => member.requestId !== personId
-              );
-              break;
-            case "modified":
-              requests = requests.filter(
-                (member: DocumentData) => member.requestId !== personId
-              );
-              requests.push(personData);
-              break;
-            default:
-              break;
+                break;
+              default:
+                break;
+            }
+          },
+          (error) => {
+            console.error(error);
           }
-        });
+        );
         prevData.current = requests;
         setData(prevData.current);
         setTableData(prevData.current);
+        console.log(prevData.current);
       });
-    unsub();
+    }
   }, []);
+
+  useEffect(() => {
+    let isMounting = true;
+
+    unsub(isMounting);
+
+    return () => {
+      isMounting = false;
+    };
+  }, [unsub]);
 
   const table = useReactTable({
     columns: RequestTableColumns,
@@ -134,44 +150,47 @@ export function RequestTable() {
 
   const toast = useToast();
 
-  function handleDelete(selectedRows: Row<DocumentData>[]): void {
-    const deletePromise = new Promise((resolve, reject) => {
-      setDeleting(true);
-      selectedRows.flatMap((e) => {
-        setTimeout(() => {
-          deleteRequest(e.original.requestId)
-            .then(resolve)
-            .catch((error) => {
-              console.error(error);
-              setDeleting(false);
-              reject();
-            });
-        }, 1000);
+  const handleDelete = useCallback(
+    (selectedRows: Row<DocumentData>[]): void => {
+      const deletePromise = new Promise((resolve, reject) => {
+        setDeleting(true);
+        selectedRows.flatMap((e) => {
+          setTimeout(() => {
+            deleteRequest(e.original.requestId)
+              .then(resolve)
+              .catch((error) => {
+                console.error(error);
+                setDeleting(false);
+                reject();
+              });
+          }, 1000);
+        });
       });
-    });
 
-    deletePromise
-      .then(() => {
-        displayToast({
-          toast: toast,
-          title: "Successfully removed requests.",
-          status: "success",
-          position: "top-right",
+      deletePromise
+        .then(() => {
+          displayToast({
+            toast: toast,
+            title: "Successfully removed requests.",
+            status: "success",
+            position: "top-right",
+          });
+          table.resetRowSelection();
+          setDeleting(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          displayToast({
+            toast: toast,
+            title: "Error removing requests.",
+            status: "error",
+            position: "top-right",
+          });
+          setDeleting(false);
         });
-        table.resetRowSelection();
-        setDeleting(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        displayToast({
-          toast: toast,
-          title: "Error removing requests.",
-          status: "error",
-          position: "top-right",
-        });
-        setDeleting(false);
-      });
-  }
+    },
+    [selectedRows]
+  );
 
   return (
     <Box>
@@ -217,7 +236,7 @@ export function RequestTable() {
           </ButtonGroup>
         </Flex>
       </Flex>
-      <Table size="md">
+      <Table size="sm">
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
@@ -270,4 +289,6 @@ export function RequestTable() {
       </Table>
     </Box>
   );
-}
+};
+
+export default RequestTable;

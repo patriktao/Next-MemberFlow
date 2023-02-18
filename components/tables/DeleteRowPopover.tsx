@@ -25,7 +25,7 @@ type Props = {
   setOpen: Function;
 };
 
-function DeleteRowPopover(props: Props) {
+const DeleteRowPopover = (props: Props) => {
   return (
     <Popover isOpen={props.isOpen}>
       <PopoverTrigger>
@@ -66,6 +66,6 @@ function DeleteRowPopover(props: Props) {
       </PopoverContent>
     </Popover>
   );
-}
+};
 
 export default DeleteRowPopover;
