@@ -21,6 +21,8 @@ import {
   Input,
   useToast,
   Tfoot,
+  FormControl,
+  IconButton,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -34,6 +36,7 @@ import {
   SortingState,
   getSortedRowModel,
   Row,
+  createColumnHelper,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
@@ -44,9 +47,10 @@ import {
   fetchRequests,
 } from "../../pages/api/requestAPI/requestAPI";
 import displayToast from "../ui_components/Toast";
-import RequestTableColumns from "./RequestTableColumns";
 import DeleteRowPopover from "./DeleteRowPopover";
 import { db } from "../../pages/api/firebase";
+import { getTimestamp } from "../../utils/date-utils";
+import { IndeterminateCheckbox } from "./RequestTableColumns";
 
 const RequestTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -55,6 +59,9 @@ const RequestTable = () => {
   const [tableData, setTableData] = useState<DocumentData[]>([]);
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
   const [isDeleting, setDeleting] = useState(false);
+  const [isEditing, setEditing] = useState(false);
+
+  const columnHelper = createColumnHelper<DocumentData>();
 
   const unsub = useCallback(async (isMounting) => {
     if (isMounting) {
@@ -111,6 +118,79 @@ const RequestTable = () => {
     };
   }, [unsub]);
 
+  const RequestTableColumns = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Box display="flex">
+          <IndeterminateCheckbox
+            {...{
+              checked: table.getIsAllRowsSelected(),
+              indeterminate: table.getIsSomeRowsSelected(),
+              onChange: table.getToggleAllRowsSelectedHandler(),
+            }}
+          />
+        </Box>
+      ),
+      cell: ({ row }) => (
+        <IndeterminateCheckbox
+          {...{
+            checked: row.getIsSelected(),
+            disabled: !row.getCanSelect(),
+            indeterminate: row.getIsSomeSelected(),
+            onChange: row.getToggleSelectedHandler(),
+          }}
+        />
+      ),
+    },
+    columnHelper.accessor("name", {
+      cell: (info) => info.getValue(),
+      header: "Name",
+    }),
+    columnHelper.accessor("email", {
+      header: "Email",
+      cell: (info) =>
+        isEditing ? (
+          <FormControl>
+            <Input size="sm" defaultValue={info.getValue()} />
+          </FormControl>
+        ) : (
+          info.getValue()
+        ),
+      meta: {
+        isNumeric: true,
+      },
+    }),
+    columnHelper.accessor("ssn", {
+      cell: (info) => info.getValue(),
+      header: "SSN",
+    }),
+    columnHelper.accessor("gender", {
+      cell: (info) => info.getValue(),
+      header: "Gender",
+    }),
+    columnHelper.accessor("reg_date", {
+      cell: (info) => getTimestamp(info.getValue()),
+      header: "Reg Date",
+    }),
+    columnHelper.accessor("period", {
+      cell: (info) => info.getValue(),
+      header: "Period",
+    }),
+    columnHelper.accessor("afMember", {
+      cell: (info) => info.getValue(),
+      header: "AF Member?",
+    }),
+    columnHelper.accessor("payMethod", {
+      cell: (info) => info.getValue(),
+      header: "Payment Method",
+    }),
+    columnHelper.accessor("hasPaid", {
+      cell: (info) => info.getValue(),
+      header: "Has Paid",
+    }),
+  ];
+
   const table = useReactTable({
     columns: RequestTableColumns,
     data: tableData,
@@ -129,9 +209,17 @@ const RequestTable = () => {
   /* Conditions */
   const selectedRows: Row<DocumentData>[] =
     table.getSelectedRowModel().flatRows;
+
   const isDeletable: boolean = selectedRows.length > 0;
 
   /* Functions */
+
+  function isRowSelected(selected: Row<DocumentData>) {
+    return selectedRows.find(
+      (row) => row.original.requestId === selected.original.requestId
+    );
+  }
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
 
@@ -224,6 +312,12 @@ const RequestTable = () => {
             >
               delete
             </DeleteRowPopover>
+            <Button
+              onClick={() => setEditing(!isEditing)}
+              variant={isEditing ? "outline" : "solid"}
+            >
+              {isEditing ? "unedit" : "edit"}
+            </Button>
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                 actions
@@ -236,7 +330,7 @@ const RequestTable = () => {
           </ButtonGroup>
         </Flex>
       </Flex>
-      <Table size="sm">
+      <Table size="md">
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
@@ -273,7 +367,11 @@ const RequestTable = () => {
               {row.getVisibleCells().map((cell) => {
                 const meta: any = cell.column.columnDef.meta;
                 return (
-                  <Td key={cell.id} isNumeric={meta?.isNumeric}>
+                  <Td
+                    key={cell.id}
+                    isNumeric={meta?.isNumeric}
+                    background={isRowSelected(row) ? hover_color : "white"}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Td>
                 );

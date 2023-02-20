@@ -8,6 +8,7 @@ import {
   PopoverBody,
   PopoverFooter,
   Button,
+  IconButton,
 } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
 import type { DocumentData } from "firebase/firestore";
@@ -33,7 +34,7 @@ const DeleteRowPopover = (props: Props) => {
           onClick={() => props.setOpen(!props.isOpen)}
           isDisabled={props.isDisabled}
           variant={props.variant ?? "outline"}
-          borderColor={props.isLoading ? "red" : "gray"}
+          colorScheme={props.isLoading || !props.isDisabled ? "red" : "gray"}
           isLoading={props.isLoading}
           spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
         >

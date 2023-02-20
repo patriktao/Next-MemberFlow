@@ -4,19 +4,12 @@ import {
   AlertIcon,
   AlertTitle,
   Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  InputGroup,
-  InputLeftElement,
   Spinner,
   Stack,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { userAuth } from "../../pages/api/firebase";
-import { EmailIcon } from "@chakra-ui/icons";
 import InputEmail from "../ui_components/InputEmail";
 
 type Props = {};
