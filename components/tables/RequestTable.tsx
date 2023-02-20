@@ -214,9 +214,11 @@ const RequestTable = () => {
 
   /* Functions */
 
-  function isRowSelected(selected: Row<DocumentData>) {
-    return selectedRows.find(
-      (row) => row.original.requestId === selected.original.requestId
+  function isRowSelected(selected: Row<DocumentData>): Boolean {
+    return Boolean(
+      selectedRows.find(
+        (row) => row.original.requestId === selected.original.requestId
+      )
     );
   }
 
