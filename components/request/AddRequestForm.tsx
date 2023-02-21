@@ -229,6 +229,7 @@ const AddRequestForm = ({ onCancel }) => {
               <Radio value="swish">Swish</Radio>
               <Radio value="swipe">Swipe</Radio>
               <Radio value="card">Card</Radio>
+              <Radio value="cash">Cash</Radio>
             </Stack>
           </RadioGroup>
         </FormControl>

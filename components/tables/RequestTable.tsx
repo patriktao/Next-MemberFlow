@@ -21,8 +21,10 @@ import {
   Input,
   useToast,
   Tfoot,
-  FormControl,
-  IconButton,
+  Editable,
+  EditablePreview,
+  EditableInput,
+  Select,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -42,15 +44,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
 import AddRequestModal from "../request/AddRequestModal";
 import { hover_color } from "../../styles/colors";
-import {
-  deleteRequest,
-  fetchRequests,
-} from "../../pages/api/requestAPI/requestAPI";
+import { deleteRequest } from "../../pages/api/requestAPI/requestAPI";
 import displayToast from "../ui_components/Toast";
 import DeleteRowPopover from "./DeleteRowPopover";
 import { db } from "../../pages/api/firebase";
 import { getTimestamp } from "../../utils/date-utils";
 import { IndeterminateCheckbox } from "./RequestTableColumns";
+import Datepicker from "../ui_components/Datepicker";
 
 const RequestTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -144,16 +144,25 @@ const RequestTable = () => {
       ),
     },
     columnHelper.accessor("name", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Editable defaultValue={info.getValue()}>
+            <EditablePreview />
+            <EditableInput />
+          </Editable>
+        ) : (
+          info.getValue()
+        ),
       header: "Name",
     }),
     columnHelper.accessor("email", {
       header: "Email",
       cell: (info) =>
         isEditing ? (
-          <FormControl>
-            <Input size="sm" defaultValue={info.getValue()} />
-          </FormControl>
+          <Editable defaultValue={info.getValue()}>
+            <EditablePreview />
+            <EditableInput />
+          </Editable>
         ) : (
           info.getValue()
         ),
@@ -162,31 +171,90 @@ const RequestTable = () => {
       },
     }),
     columnHelper.accessor("ssn", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Editable defaultValue={info.getValue()}>
+            <EditablePreview />
+            <EditableInput />
+          </Editable>
+        ) : (
+          info.getValue()
+        ),
       header: "SSN",
     }),
     columnHelper.accessor("gender", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Select defaultValue={info.getValue()}>
+            <option value="male">male</option>
+            <option value="female">female</option>
+            <option value="other">other</option>
+          </Select>
+        ) : (
+          info.getValue()
+        ),
       header: "Gender",
     }),
     columnHelper.accessor("reg_date", {
-      cell: (info) => getTimestamp(info.getValue()),
+      cell: (info) =>
+        isEditing ? (
+          <Datepicker
+            date={getTimestamp(info.getValue())}
+            onChange={() => ""}
+          />
+        ) : (
+          getTimestamp(info.getValue())
+        ),
       header: "Reg Date",
     }),
     columnHelper.accessor("period", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Select defaultValue={info.getValue()}>
+            <option value="6">6</option>
+            <option value="12">12</option>
+          </Select>
+        ) : (
+          info.getValue()
+        ),
       header: "Period",
     }),
     columnHelper.accessor("afMember", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Select defaultValue={info.getValue()}>
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+          </Select>
+        ) : (
+          info.getValue()
+        ),
       header: "AF Member?",
     }),
     columnHelper.accessor("payMethod", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Select defaultValue={info.getValue()}>
+            <option value="swish">swish</option>
+            <option value="swipe">swipe</option>
+            <option value="card">card</option>
+            <option value="card">cash</option>
+          </Select>
+        ) : (
+          info.getValue()
+        ),
       header: "Payment Method",
     }),
     columnHelper.accessor("hasPaid", {
-      cell: (info) => info.getValue(),
+      cell: (info) =>
+        isEditing ? (
+          <Select defaultValue={info.getValue()}>
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+          </Select>
+        ) : (
+          info.getValue()
+        ),
       header: "Has Paid",
     }),
   ];
@@ -210,7 +278,7 @@ const RequestTable = () => {
   const selectedRows: Row<DocumentData>[] =
     table.getSelectedRowModel().flatRows;
 
-  const isDeletable: boolean = selectedRows.length > 0;
+  const rowsSelected: boolean = selectedRows.length > 0;
 
   /* Functions */
 
@@ -292,6 +360,14 @@ const RequestTable = () => {
         </Box>
         <Spacer />
         <Flex columnGap={"0.5rem"}>
+          <Button
+            variant="outline"
+            colorScheme="teal"
+            isDisabled={!rowsSelected}
+            onClick={() => table.resetRowSelection()}
+          >
+            deselect
+          </Button>
           <Input
             placeholder="search here..."
             w="300px"
@@ -304,22 +380,22 @@ const RequestTable = () => {
               add
             </Button>
             <AddRequestModal isOpen={isOpen} onClose={onClose} />
-            <DeleteRowPopover
-              selectedRows={selectedRows}
-              handleDelete={handleDelete}
-              isDisabled={!isDeletable}
-              isLoading={isDeleting}
-              isOpen={isPopoverOpen}
-              setOpen={setPopoverOpen}
-            >
-              delete
-            </DeleteRowPopover>
             <Button
               onClick={() => setEditing(!isEditing)}
               variant={isEditing ? "outline" : "solid"}
             >
               {isEditing ? "unedit" : "edit"}
             </Button>
+            <DeleteRowPopover
+              selectedRows={selectedRows}
+              handleDelete={handleDelete}
+              isDisabled={!rowsSelected}
+              isLoading={isDeleting}
+              isOpen={isPopoverOpen}
+              setOpen={setPopoverOpen}
+            >
+              delete
+            </DeleteRowPopover>
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
                 actions
@@ -372,7 +448,7 @@ const RequestTable = () => {
                   <Td
                     key={cell.id}
                     isNumeric={meta?.isNumeric}
-                    background={isRowSelected(row) ? hover_color : "white"}
+                    background={isRowSelected(row) ? hover_color : ""}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Td>

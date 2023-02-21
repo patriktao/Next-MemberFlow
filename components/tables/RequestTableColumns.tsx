@@ -1,5 +1,4 @@
 import { Box, Checkbox } from "@chakra-ui/react";
-import { isRowSelected } from "@tanstack/react-table";
 import { HTMLProps, useEffect, useRef } from "react";
 
 export const IndeterminateCheckbox = ({
