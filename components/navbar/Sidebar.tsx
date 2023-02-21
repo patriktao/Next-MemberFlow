@@ -11,9 +11,9 @@ import {
   MenuList,
   useToast,
 } from "@chakra-ui/react";
-import { FiMenu, FiHome, FiCalendar, FiUser, FiSettings } from "react-icons/fi";
+import { FiMenu, FiHome, FiCalendar, FiUser } from "react-icons/fi";
 import NavItem from "./NavItem";
-import component_color from "../../styles/colors";
+import { component_color } from "../../styles/colors";
 import { useRouter } from "next/router";
 import { NavContext } from "../../pages/contexts/NavContext";
 import { ChevronRightIcon } from "@chakra-ui/icons";
@@ -80,7 +80,6 @@ function Sidebar() {
       left="5"
       h="95vh"
       marginTop="2.5vh"
-      //boxShadow="0 4px 12px 0 rgba(0, 0, 0, 0.05)"
       boxShadow="0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)"
       borderRadius={navSize == "small" ? "15px" : "30px"}
       w={navSize == "small" ? "75px" : "200px"}
