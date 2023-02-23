@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { FiMenu, FiHome, FiCalendar, FiUser, FiSettings } from "react-icons/fi";
 import NavItem from "./NavItem";
-import component_color from "../../styles/colors";
+import { component_color } from "../../styles/colors";
 import { useRouter } from "next/router";
 import { NavContext } from "../../pages/contexts/NavContext";
 import { ChevronRightIcon } from "@chakra-ui/icons";
