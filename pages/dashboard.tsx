@@ -1,4 +1,4 @@
-import { Heading } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import withAuth from "../components/auth/withAuth";
 import Layout from "../components/Layout";
 import RequestTable from "../components/tables/RequestTable/RequestTable";

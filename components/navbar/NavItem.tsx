@@ -6,9 +6,7 @@ import {
   Link,
   Menu,
   MenuButton,
-  MenuList,
 } from "@chakra-ui/react";
-import NavHoverBox from "./NavHoverBox";
 import NextLink from "next/link";
 
 const NavItem = ({ icon, title, description, active, navSize, path }) => {
@@ -42,9 +40,6 @@ const NavItem = ({ icon, title, description, active, navSize, path }) => {
             </Flex>
           </MenuButton>
         </Link>
-        <MenuList py={0} border="none" w={200} h={200} ml={5}>
-          <NavHoverBox title={title} icon={icon} description={description} />
-        </MenuList>
       </Menu>
     </Flex>
   );

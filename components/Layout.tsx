@@ -1,15 +1,18 @@
 import React, { ReactNode } from "react";
 import Head from "next/head";
 import Sidebar from "./navbar/Sidebar";
-import { Box, Flex, Heading } from "@chakra-ui/react";
-import component_color from "../styles/colors";
+import { Box, Flex } from "@chakra-ui/react";
+import { component_color } from "../styles/colors";
 
 type Props = {
   children?: ReactNode;
   title?: string;
 };
 
-const Layout = ({ children, title = "This is the default title" }: Props) => (
+const Layout: React.FC<Props> = ({
+  children,
+  title = "This is the default title",
+}: Props) => (
   <Flex columnGap="3rem">
     <Head>
       <title>{title}</title>
