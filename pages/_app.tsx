@@ -1,6 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import { Container, Heading, Text } from "@chakra-ui/layout";
-import bg_color from "../styles/colors";
+import { Container } from "@chakra-ui/layout";
+import { bg_color } from "../styles/colors";
 import { NavProvider } from "./contexts/NavContext";
 
 function MyApp({ Component, pageProps }) {

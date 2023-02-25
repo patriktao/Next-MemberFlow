@@ -8,7 +8,6 @@ import {
 } from "@chakra-ui/react";
 import AddRequestForm from "./AddRequestForm";
 
-// Ensure you set `closeOnBlur` prop to false so it doesn't close on outside click
 const AddRequestModal = ({ isOpen, onClose }) => {
   return (
     <>

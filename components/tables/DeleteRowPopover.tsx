@@ -26,7 +26,7 @@ type Props = {
   setOpen: Function;
 };
 
-const DeleteRowPopover = (props: Props) => {
+const DeleteRowPopover: React.FC<Props> = (props: Props) => {
   return (
     <Popover isOpen={props.isOpen}>
       <PopoverTrigger>

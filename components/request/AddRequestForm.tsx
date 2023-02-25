@@ -25,15 +25,19 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { createNewRequest } from "../../pages/api/requestAPI/requestAPI";
+import { membershipPeriods, paymentMethods } from "../../utils/payment-methods";
 import InputEmail from "../ui_components/InputEmail";
 import LoadingButton from "../ui_components/LoadingButton";
 import displayToast from "../ui_components/Toast";
 import Info from "./DataInfo";
 
-const AddRequestForm = ({ onCancel }) => {
-  /* State Management */
+interface Props {
+  onCancel: Function;
+}
+
+const AddRequestForm: React.FC<Props> = (props: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -100,7 +104,7 @@ const AddRequestForm = ({ onCancel }) => {
             status: "success",
             position: "right-top",
           });
-          onCancel();
+          props.onCancel();
           resetForm();
         })
         .catch((error) => {
@@ -150,7 +154,7 @@ const AddRequestForm = ({ onCancel }) => {
         </FormControl>
         <InputEmail
           errorMessage={errorMessage}
-          setEmail={setEmail}
+          setEmail={(e) => setEmail(e.target.value)}
           setErrorMessage={setErrorMessage}
           emailError={emailError}
           value={email}
@@ -226,19 +230,19 @@ const AddRequestForm = ({ onCancel }) => {
             onChange={(value) => setPayMethod(value)}
           >
             <Stack direction="row">
-              <Radio value="swish">Swish</Radio>
-              <Radio value="swipe">Swipe</Radio>
-              <Radio value="card">Card</Radio>
-              <Radio value="cash">Cash</Radio>
+              {paymentMethods.map((item) => (
+                <Radio value={item}>{item}</Radio>
+              ))}
             </Stack>
           </RadioGroup>
         </FormControl>
         <FormControl>
-          <FormLabel>Membership Period</FormLabel>
+          <FormLabel>Membership Period (months)</FormLabel>
           <RadioGroup value={period} onChange={(value) => setPeriod(value)}>
             <Stack direction="row">
-              <Radio value="6">6 Months (50 kr)</Radio>
-              <Radio value="12">12 Months (70 kr)</Radio>
+              {membershipPeriods.map((item) => (
+                <Radio value={item}>{item}</Radio>
+              ))}
             </Stack>
           </RadioGroup>
         </FormControl>
@@ -252,7 +256,7 @@ const AddRequestForm = ({ onCancel }) => {
         </Checkbox>
         {DataModal}
         <ButtonGroup display="flex" justifyContent="flex-end">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={() => props.onCancel()}>
             Cancel
           </Button>
           <LoadingButton
