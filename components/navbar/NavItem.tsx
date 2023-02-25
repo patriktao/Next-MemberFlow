@@ -11,14 +11,7 @@ import {
 import NavHoverBox from "./NavHoverBox";
 import NextLink from "next/link";
 
-export default function NavItem({
-  icon,
-  title,
-  description,
-  active,
-  navSize,
-  path,
-}) {
+const NavItem = ({ icon, title, description, active, navSize, path }) => {
   return (
     <Flex
       mt={30}
@@ -55,4 +48,6 @@ export default function NavItem({
       </Menu>
     </Flex>
   );
-}
+};
+
+export default NavItem;

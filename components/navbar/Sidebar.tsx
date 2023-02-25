@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, FunctionComponent } from "react";
 import {
   Flex,
   IconButton,
@@ -20,7 +20,7 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { logOut } from "../../pages/api/authAPI/authAPI";
 import displayToast from "../ui_components/Toast";
 
-function Sidebar() {
+const Sidebar: React.FC = () => {
   const { pathname } = useRouter();
   const context = useContext(NavContext);
   const { navSize, setNavSize, selectedNavItem, setSelectedNavItem } =
@@ -166,6 +166,6 @@ function Sidebar() {
       </Flex>
     </Flex>
   );
-}
+};
 
 export default Sidebar;

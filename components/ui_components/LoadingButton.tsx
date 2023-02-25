@@ -1,5 +1,5 @@
 import { Button, Spinner } from "@chakra-ui/react";
-import React, { ReactNode } from "react";
+import React, { FunctionComponent, ReactNode } from "react";
 
 interface Props {
   isLoading: boolean;
@@ -11,7 +11,7 @@ interface Props {
   variant?: string;
 }
 
-const LoadingButton = (props: Props) => {
+const LoadingButton: React.FC<Props> = (props: Props) => {
   return (
     <Button
       type="submit"

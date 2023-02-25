@@ -1,15 +1,13 @@
 import { Box, forwardRef, Tag, Tooltip } from "@chakra-ui/react";
+import { FunctionComponent, ReactNode } from "react";
 
-const CustomCard = forwardRef(({ children, ...rest }, ref) => (
-  <Box p="1">
-    <Tag ref={ref} {...rest}>
-      {children}
-    </Tag>
-  </Box>
-));
+interface Props {
+  children?: ReactNode;
+  label?: string;
+}
 
-const ToolTip = ({ children }, text) => {
-  return <Tooltip label={text}>{children}</Tooltip>;
+const ToolTip: React.FC<Props> = (props: Props) => {
+  return <Tooltip label={props.label}>{props.children}</Tooltip>;
 };
 
 export default ToolTip;

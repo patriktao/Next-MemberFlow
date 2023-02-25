@@ -17,7 +17,7 @@ import LoadingButton from "../ui_components/LoadingButton";
 
 type Props = {};
 
-const AuthForm = (props: Props) => {
+const AuthForm: React.FC<Props> = (props: Props) => {
   /* States */
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +32,7 @@ const AuthForm = (props: Props) => {
   const router = useRouter();
   const toast = useToast();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     setLoading(true);
     logIn(email, password)

@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Heading, Text, Icon } from "@chakra-ui/react";
 
-export default function NavHoverBox({ title, icon, description }) {
+const NavHoverBox = ({ title, icon, description }) => {
   return (
     <>
       <Flex
@@ -34,4 +34,6 @@ export default function NavHoverBox({ title, icon, description }) {
       </Flex>
     </>
   );
-}
+};
+
+export default NavHoverBox;

@@ -69,7 +69,7 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
     const uid = v4();
     return await setDoc(doc(requestCollection, uid), {
       requestId: uid,
-      reg_date: Timestamp.now(),
+      regDate: Timestamp.now(),
       name: form.name,
       email: form.email,
       ssn: form.ssn,

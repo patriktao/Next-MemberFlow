@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { Spinner as ChakraSpinner } from "@chakra-ui/react";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   size?: "md" | "sm" | "lg" | "xl" | "xs";
 }
 
-const Spinner = (props: Props) => {
+const Spinner: React.FC<Props> = (props: Props) => {
   return (
     <ChakraSpinner
       style={{ marginLeft: "0.5rem" }}

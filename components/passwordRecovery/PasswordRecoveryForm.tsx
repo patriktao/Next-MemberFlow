@@ -7,14 +7,14 @@ import {
   Spinner,
   Stack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { FunctionComponent, useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { userAuth } from "../../pages/api/firebase";
 import InputEmail from "../ui_components/InputEmail";
 
 type Props = {};
 
-const PasswordRecoveryForm = (props: Props) => {
+const PasswordRecoveryForm: React.FC<Props> = (props: Props) => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setLoading] = useState(false);

@@ -7,7 +7,6 @@ import {
   Input,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import React from "react";
 
 interface Props {
   errorMessage: string;
@@ -17,7 +16,7 @@ interface Props {
   value: string;
 }
 
-const InputEmail = (props: Props) => {
+const InputEmail: React.FC<Props> = (props: Props) => {
   return (
     <FormControl id="email" isInvalid={Boolean(props.errorMessage)}>
       <FormLabel>Email address</FormLabel>
@@ -27,6 +26,7 @@ const InputEmail = (props: Props) => {
           children={<EmailIcon color="gray.300" />}
         />
         <Input
+          name="email"
           type="email"
           placeholder="Enter email..."
           value={props.value}

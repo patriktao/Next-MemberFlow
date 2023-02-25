@@ -1,4 +1,5 @@
 import { useToast } from "@chakra-ui/react";
+import { FunctionComponent } from "react";
 
 interface ToastProps {
   title: string;
@@ -9,7 +10,7 @@ interface ToastProps {
   position?: string;
 }
 
-const displayToast = (props: ToastProps) => {
+const displayToast: Function = (props: ToastProps) => {
   const toast = props.toast;
   toast({
     title: props.title,

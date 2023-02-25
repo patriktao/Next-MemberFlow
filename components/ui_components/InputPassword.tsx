@@ -7,7 +7,7 @@ import {
   Input,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { FunctionComponent } from "react";
 
 interface Props {
   errorMessage: string;
@@ -17,7 +17,7 @@ interface Props {
   value: string;
 }
 
-const InputPassword = (props: Props) => {
+const InputPassword: React.FC<Props> = (props: Props) => {
   return (
     <FormControl id="password" isInvalid={Boolean(props.errorMessage)}>
       <FormLabel>Password</FormLabel>
