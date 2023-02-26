@@ -25,6 +25,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
+import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
 import { createNewRequest } from "../../pages/api/requestAPI/requestAPI";
 import { membershipPeriods, paymentMethods } from "../../utils/payment-methods";
@@ -92,6 +93,8 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       afMember: afMember,
       payMethod: payMethod,
       period: period,
+      regDate: Timestamp.now(),
+      hasPaid: "no",
     };
 
     setTimeout(() => {
@@ -116,6 +119,7 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
             status: "error",
           });
         });
+      setLoading(false);
     }, 500);
   };
 
@@ -154,8 +158,10 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
         </FormControl>
         <InputEmail
           errorMessage={errorMessage}
-          setEmail={(e) => setEmail(e.target.value)}
-          setErrorMessage={setErrorMessage}
+          setEmail={(e) => {
+            setEmail(e.target.value);
+            setErrorMessage("");
+          }}
           emailError={emailError}
           value={email}
         />

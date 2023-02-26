@@ -10,8 +10,7 @@ export interface State {
   period: string;
   hasPaid: string;
   regDate: Timestamp;
-  errorMessage: string;
-  isLoading: boolean;
+  requestId: string;
 }
 
 export type Action =
@@ -21,11 +20,9 @@ export type Action =
   | { type: "gender"; input: string }
   | { type: "afMember"; input: string }
   | { type: "payMethod"; input: string }
-  | { type: "period"; input: string }
   | { type: "hasPaid"; input: string }
-  | { type: "regDate"; input: Timestamp }
-  | { type: "errorMessage"; input: string }
-  | { type: "isLoading"; input: boolean };
+  | { type: "period"; input: string }
+  | { type: "regDate"; input: Timestamp };
 
 export const reducer = (state: State, action: Action): State => {
   try {
@@ -48,10 +45,6 @@ export const reducer = (state: State, action: Action): State => {
         return { ...state, hasPaid: action.input };
       case "regDate":
         return { ...state, regDate: action.input };
-      case "errorMessage":
-        return { ...state, errorMessage: action.input };
-      case "isLoading":
-        return { ...state, isLoading: action.input };
       default:
         return state;
     }

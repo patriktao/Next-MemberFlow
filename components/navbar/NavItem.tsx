@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Flex,
-  Text,
-  Icon,
-  Link,
-  Menu,
-  MenuButton,
-} from "@chakra-ui/react";
+import { Flex, Text, Icon, Link, Menu, MenuButton } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 const NavItem = ({ icon, title, description, active, navSize, path }) => {

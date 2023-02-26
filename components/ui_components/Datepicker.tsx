@@ -1,20 +1,27 @@
 import React from "react";
-import { DatePicker } from "@orange_digital/chakra-datepicker";
 import { FormControl, FormLabel } from "@chakra-ui/react";
+import { SingleDatepicker } from "chakra-dayzed-datepicker";
 
 interface Props {
   date?: string;
   onChange?: Function;
   label?: string;
+  name?: string;
 }
 
-const Datepicker: React.FC<Props> = ({ date, onChange, label }: Props) => {
+const Datepicker: React.FC<Props> = ({
+  date,
+  onChange,
+  label,
+  name,
+}: Props) => {
   return (
     <FormControl>
       <FormLabel>{label || ""}</FormLabel>
-      <DatePicker
-        initialValue={Boolean(date) ? new Date(date) : new Date()}
-        onDateChange={(value) => onChange(value)}
+      <SingleDatepicker
+        name={name || ""}
+        date={Boolean(date) ? new Date(date) : new Date()}
+        onDateChange={(e) => onChange(e)}
       />
     </FormControl>
   );

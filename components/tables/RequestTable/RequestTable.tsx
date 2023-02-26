@@ -43,10 +43,9 @@ import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
 import displayToast from "../../ui_components/Toast";
 import DeleteRowPopover from "../DeleteRowPopover";
 import { db } from "../../../pages/api/firebase";
-import { getTimestamp } from "../../../utils/date-utils";
 import RequestTableColumns from "./RequestTableColumns";
-import Datepicker from "../../ui_components/Datepicker";
-import EditRowForm from "../EditRowForm";
+import EditRowForm from "../EditRowForm/EditRowForm";
+import FormModal from "../../ui_components/FormModal";
 
 const RequestTable: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -55,7 +54,6 @@ const RequestTable: React.FC = () => {
   const [tableData, setTableData] = useState<DocumentData[]>([]);
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
   const [isDeleting, setDeleting] = useState(false);
-  const [isEditing, setEditing] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
@@ -209,13 +207,6 @@ const RequestTable: React.FC = () => {
     [editingRow]
   );
 
-  const saveRow = useCallback(
-    (updatedRow): void => {
-      setEditingRow(null);
-    },
-    [editingRow]
-  );
-
   const closeEdit = useCallback((): void => {
     setEditingRow(null);
   }, [editingRow]);
@@ -276,7 +267,7 @@ const RequestTable: React.FC = () => {
                   </>
                 );
               })}
-              <Td>
+              <Td background={isRowSelected(row) ? hover_color : ""}>
                 <Button
                   variant="outline"
                   size="sm"
@@ -287,11 +278,14 @@ const RequestTable: React.FC = () => {
               </Td>
             </Tr>
             {editingRow && editingRow.requestId === row.original.requestId && (
-              <EditRowForm
-                row={editingRow}
-                onSave={saveRow}
+              <FormModal
+                isOpen={Boolean(editingRow)}
                 onClose={closeEdit}
-              />
+                title={"Edit Request"}
+                size="3xl"
+              >
+                <EditRowForm row={editingRow} onClose={closeEdit} />
+              </FormModal>
             )}
           </>
         ))}
@@ -334,12 +328,6 @@ const RequestTable: React.FC = () => {
               add
             </Button>
             <AddRequestModal isOpen={isOpen} onClose={onClose} />
-            <Button
-              onClick={() => setEditing(!isEditing)}
-              variant={isEditing ? "outline" : "solid"}
-            >
-              {isEditing ? "unedit" : "edit"}
-            </Button>
             <DeleteRowPopover
               selectedRows={selectedRows}
               handleDelete={handleDelete}

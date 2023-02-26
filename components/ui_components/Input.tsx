@@ -10,6 +10,7 @@ interface Props {
   size?: string;
   type?: string;
   label?: ReactNode | string;
+  maxLength?: number;
 }
 
 const Input: React.FC<Props> = (props: Props) => {
@@ -17,6 +18,7 @@ const Input: React.FC<Props> = (props: Props) => {
     <FormControl>
       <FormLabel>{props.label || ""}</FormLabel>
       <ChakraInput
+        maxLength={props.maxLength || 50}
         value={props.value || ""}
         name={props.name || ""}
         placeholder={props.placeholder || ""}

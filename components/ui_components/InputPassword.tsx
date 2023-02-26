@@ -12,7 +12,6 @@ import React, { FunctionComponent } from "react";
 interface Props {
   errorMessage: string;
   setPassword: Function;
-  setErrorMessage: Function;
   passwordError: boolean;
   value: string;
 }
@@ -31,8 +30,7 @@ const InputPassword: React.FC<Props> = (props: Props) => {
           value={props.value}
           placeholder="Enter password..."
           onChange={(e) => {
-            props.setPassword(e.target.value);
-            props.setErrorMessage("");
+            props.setPassword(e);
           }}
           isRequired
         />

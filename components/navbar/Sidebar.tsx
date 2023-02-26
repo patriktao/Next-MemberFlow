@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, FunctionComponent } from "react";
+import React, { useEffect, useContext } from "react";
 import {
   Flex,
   IconButton,

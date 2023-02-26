@@ -11,7 +11,6 @@ import {
 interface Props {
   errorMessage: string;
   setEmail: Function;
-  setErrorMessage: Function;
   emailError: boolean;
   value: string;
 }
@@ -31,8 +30,7 @@ const InputEmail: React.FC<Props> = (props: Props) => {
           placeholder="Enter email..."
           value={props.value}
           onChange={(e) => {
-            props.setEmail(e.target.value);
-            props.setErrorMessage("");
+            props.setEmail(e);
           }}
           isRequired
         />

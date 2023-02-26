@@ -61,15 +61,19 @@ const AuthForm: React.FC<Props> = (props: Props) => {
       <Stack spacing="4">
         <InputEmail
           errorMessage={errorMessage}
-          setEmail={setEmail}
-          setErrorMessage={setErrorMessage}
+          setEmail={(e) => {
+            setEmail(e.target.value);
+            setErrorMessage("");
+          }}
           emailError={emailError}
           value={email}
         />
         <InputPassword
           errorMessage={errorMessage}
-          setPassword={setPassword}
-          setErrorMessage={setErrorMessage}
+          setPassword={(e) => {
+            setPassword(e.target.value);
+            setErrorMessage("");
+          }}
           passwordError={passwordError}
           value={password}
         />
