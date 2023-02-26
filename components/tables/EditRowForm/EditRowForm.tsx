@@ -206,21 +206,18 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             </option>
           </Select>
         </Grid>
-        <Flex justifyContent="space-between">
-          <Button variant="outline">Reset All</Button>
-          <ButtonGroup display="flex" justifyContent="flex-end">
-            <Button variant="outline" onClick={() => onClose()}>
-              Cancel
-            </Button>
-            <LoadingButton
-              color="teal"
-              isDisabled={!isChanged}
-              isLoading={isLoading}
-            >
-              Save
-            </LoadingButton>
-          </ButtonGroup>
-        </Flex>
+        <ButtonGroup display="flex" justifyContent="flex-end">
+          <Button variant="outline" onClick={() => onClose()}>
+            Cancel
+          </Button>
+          <LoadingButton
+            color="teal"
+            isDisabled={!isChanged}
+            isLoading={isLoading}
+          >
+            Save
+          </LoadingButton>
+        </ButtonGroup>
       </Flex>
     </form>
   );

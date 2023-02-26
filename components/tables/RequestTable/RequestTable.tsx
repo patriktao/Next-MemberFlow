@@ -21,6 +21,8 @@ import {
   Input,
   useToast,
   Tfoot,
+  Text,
+  Grid,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -34,6 +36,8 @@ import {
   SortingState,
   getSortedRowModel,
   Row,
+  PaginationState,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
@@ -43,7 +47,9 @@ import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
 import displayToast from "../../ui_components/Toast";
 import DeleteRowPopover from "../DeleteRowPopover";
 import { db } from "../../../pages/api/firebase";
-import RequestTableColumns from "./RequestTableColumns";
+import RequestTableColumns, {
+  IndeterminateCheckbox,
+} from "./RequestTableColumns";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import FormModal from "../../ui_components/FormModal";
 
@@ -57,6 +63,11 @@ const RequestTable: React.FC = () => {
   const [editingRow, setEditingRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
+
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 12,
+  });
 
   const unsub = useCallback(async (isMounting) => {
     if (isMounting) {
@@ -113,15 +124,38 @@ const RequestTable: React.FC = () => {
     };
   }, [unsub]);
 
+  const pagination = React.useMemo(
+    () => ({
+      pageIndex,
+      pageSize,
+    }),
+    [pageIndex, pageSize]
+  );
+
+  /* EDIT */
+  const editRow = useCallback(
+    (row): void => {
+      setEditingRow(row.original);
+    },
+    [editingRow]
+  );
+
+  const closeEdit = useCallback((): void => {
+    setEditingRow(null);
+  }, [editingRow]);
+
   const table = useReactTable({
-    columns: RequestTableColumns,
+    columns: RequestTableColumns(editRow),
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     state: {
       sorting,
       rowSelection,
+      pagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -199,17 +233,6 @@ const RequestTable: React.FC = () => {
     },
     [selectedRows]
   );
-  /* EDIT */
-  const editRow = useCallback(
-    (row): void => {
-      setEditingRow(row.original);
-    },
-    [editingRow]
-  );
-
-  const closeEdit = useCallback((): void => {
-    setEditingRow(null);
-  }, [editingRow]);
 
   const TableView = (
     <Table size="sm">
@@ -267,15 +290,6 @@ const RequestTable: React.FC = () => {
                   </>
                 );
               })}
-              <Td background={isRowSelected(row) ? hover_color : ""}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => editRow(row)}
-                >
-                  Edit
-                </Button>
-              </Td>
             </Tr>
             {editingRow && editingRow.requestId === row.original.requestId && (
               <FormModal
@@ -291,9 +305,64 @@ const RequestTable: React.FC = () => {
         ))}
       </Tbody>
       <Tfoot>
-        <Tr>
-          <Th colSpan={10}>Selected: {selectedRows.length}</Th>
-        </Tr>
+        <Th colSpan={12}>
+          <Flex
+            gap={"1rem"}
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems={"center"}
+          >
+            <Flex gap={"1rem"}>
+              <IndeterminateCheckbox
+                {...{
+                  checked: table.getIsAllPageRowsSelected(),
+                  indeterminate: table.getIsSomePageRowsSelected(),
+                  onChange: table.getToggleAllPageRowsSelectedHandler(),
+                }}
+              />
+              <Box>Selected: {selectedRows.length}</Box>
+            </Flex>
+            <Grid gridAutoFlow={"column"} columnGap="1rem">
+              <Box flexDirection="row">
+                Page
+                <Text fontWeight={700}>
+                  {table.getState().pagination.pageIndex + 1} of{" "}
+                  {table.getPageCount()}
+                </Text>
+              </Box>
+              <ButtonGroup>
+                <Button
+                  size="sm"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {"<<"}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  {"<"}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {">"}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  {">>"}
+                </Button>
+              </ButtonGroup>
+            </Grid>
+          </Flex>
+        </Th>
       </Tfoot>
     </Table>
   );
