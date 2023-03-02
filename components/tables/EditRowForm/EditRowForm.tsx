@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Flex, Grid, useToast } from "@chakra-ui/react";
 import { DocumentData, Timestamp } from "firebase/firestore";
 import { isEqual } from "lodash";
-import { useCallback, useReducer, useState } from "react";
+import { ChangeEvent, useCallback, useReducer, useState } from "react";
 import { getTimestamp } from "../../../utils/date-utils";
 import {
   membershipPeriods,
@@ -105,14 +105,14 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             name="name"
             placeholder="Type full name"
             isRequired
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               handleChange(e);
               setErrorMessage("");
             }}
           />
           <InputEmail
             value={state.email}
-            setEmail={(e) => {
+            setEmail={(e: ChangeEvent<HTMLInputElement>) => {
               handleChange(e);
               setErrorMessage("");
             }}
@@ -132,7 +132,7 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             name="ssn"
             value={state.ssn}
             type="alphanumeric"
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               handleChange(e);
             }}
             maxLength={13}

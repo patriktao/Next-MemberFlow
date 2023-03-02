@@ -38,8 +38,9 @@ import {
   Row,
   PaginationState,
   getPaginationRowModel,
+  ColumnResizeMode,
 } from "@tanstack/react-table";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
 import AddRequestModal from "../../request/AddRequestModal";
 import { hover_color } from "../../../styles/colors";
@@ -63,6 +64,8 @@ const RequestTable: React.FC = () => {
   const [editingRow, setEditingRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
+  const [columnResizeMode, setColumnResizeMode] =
+    React.useState<ColumnResizeMode>("onChange");
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -152,13 +155,13 @@ const RequestTable: React.FC = () => {
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       rowSelection,
       pagination,
     },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
   });
 
   /* Conditions */
@@ -235,7 +238,14 @@ const RequestTable: React.FC = () => {
   );
 
   const TableView = (
-    <Table size="sm">
+    <Table
+      size="sm"
+      {...{
+        style: {
+          width: table.getCenterTotalSize(),
+        },
+      }}
+    >
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -304,95 +314,34 @@ const RequestTable: React.FC = () => {
           </>
         ))}
       </Tbody>
-      <Tfoot>
-        <Th colSpan={12}>
-          <Flex
-            gap={"1rem"}
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems={"center"}
-          >
-            <Flex gap={"1rem"}>
-              <IndeterminateCheckbox
-                {...{
-                  checked: table.getIsAllPageRowsSelected(),
-                  indeterminate: table.getIsSomePageRowsSelected(),
-                  onChange: table.getToggleAllPageRowsSelectedHandler(),
-                }}
-              />
-              <Box>Selected: {selectedRows.length}</Box>
-            </Flex>
-            <Grid gridAutoFlow={"column"} columnGap="1rem">
-              <Box flexDirection="row">
-                Page
-                <Text fontWeight={700}>
-                  {table.getState().pagination.pageIndex + 1} of{" "}
-                  {table.getPageCount()}
-                </Text>
-              </Box>
-              <ButtonGroup>
-                <Button
-                  size="sm"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  {"<<"}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  {"<"}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  {">"}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                >
-                  {">>"}
-                </Button>
-              </ButtonGroup>
-            </Grid>
-          </Flex>
-        </Th>
-      </Tfoot>
     </Table>
   );
 
   return (
-    <Box>
-      <Flex marginBottom={"8px"}>
-        <Box>
-          <Heading as="h3" size="md">
-            requests ({tableData.length ?? 0})
-          </Heading>
-        </Box>
-        <Spacer />
-        <Flex columnGap={"0.5rem"}>
-          <Button
-            variant="outline"
-            colorScheme="teal"
-            isDisabled={!rowsSelected}
-            onClick={() => table.resetRowSelection()}
-          >
-            deselect
-          </Button>
-          <Input
-            placeholder="search here..."
-            w="300px"
-            onChange={(e) => {
-              formatData(e.target.value.toLowerCase());
-            }}
-          />
+    <Grid>
+      <Flex marginBottom={"8px"} justifyContent="space-between" flexFlow="wrap">
+        <Heading as="h3" size="md">
+          requests ({tableData.length ?? 0})
+        </Heading>
+        <Flex>
           <ButtonGroup>
+            <Button
+              variant="outline"
+              colorScheme="teal"
+              isDisabled={!rowsSelected}
+              onClick={() => table.resetRowSelection()}
+            >
+              deselect
+            </Button>
+            <Input
+              placeholder="search here..."
+              maxW="300px"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                formatData(e.target.value.toLowerCase());
+              }}
+            />
+          </ButtonGroup>
+          <ButtonGroup marginLeft="0.5rem">
             <Button colorScheme="teal" onClick={onOpen}>
               add
             </Button>
@@ -419,8 +368,65 @@ const RequestTable: React.FC = () => {
           </ButtonGroup>
         </Flex>
       </Flex>
-      {TableView}
-    </Box>
+      <Flex overflowY="auto">{TableView}</Flex>
+      <Flex
+        gap={"1rem"}
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems={"center"}
+        className="css-r10se1"
+      >
+        <Flex gap={"1rem"}>
+          <IndeterminateCheckbox
+            {...{
+              checked: table.getIsAllPageRowsSelected(),
+              indeterminate: table.getIsSomePageRowsSelected(),
+              onChange: table.getToggleAllPageRowsSelectedHandler(),
+            }}
+          />
+          <Box>Selected: {selectedRows.length}</Box>
+        </Flex>
+        <Flex gridAutoFlow={"column"} columnGap="1rem">
+          <Box flexDirection="row">
+            Page
+            <Text fontWeight={700}>
+              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+            </Text>
+          </Box>
+          <ButtonGroup>
+            <Button
+              size="sm"
+              onClick={() => table.setPageIndex(0)}
+              disabled={table.getCanPreviousPage()}
+            >
+              {"<<"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={table.getCanPreviousPage()}
+            >
+              {"<"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              {">"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              {">>"}
+            </Button>
+          </ButtonGroup>
+        </Flex>
+      </Flex>
+    </Grid>
   );
 };
 

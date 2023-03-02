@@ -1,4 +1,4 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Grid, Heading } from "@chakra-ui/react";
 import withAuth from "../components/auth/withAuth";
 import Layout from "../components/Layout";
 import RequestTable from "../components/tables/RequestTable/RequestTable";
@@ -8,7 +8,9 @@ const Dashboard = () => (
     <Heading as="h1" size="lg" paddingBottom="1rem">
       dashboard.
     </Heading>
-    <RequestTable />
+    <Grid>
+      <RequestTable />
+    </Grid>
   </Layout>
 );
 

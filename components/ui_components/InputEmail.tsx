@@ -7,6 +7,7 @@ import {
   Input,
   FormErrorMessage,
 } from "@chakra-ui/react";
+import { ChangeEvent } from "react";
 
 interface Props {
   errorMessage: string;
@@ -29,7 +30,7 @@ const InputEmail: React.FC<Props> = (props: Props) => {
           type="email"
           placeholder="Enter email..."
           value={props.value}
-          onChange={(e) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             props.setEmail(e);
           }}
           isRequired

@@ -68,10 +68,12 @@ const RequestTableColumns = (
     columnHelper.accessor("ssn", {
       cell: (info) => info.getValue(),
       header: "SSN",
+      enableResizing: true,
     }),
     columnHelper.accessor("gender", {
       cell: (info) => info.getValue(),
       header: "Gender",
+      enableResizing: true,
     }),
     columnHelper.accessor("regDate", {
       cell: (info) => getTimestamp(info.getValue()),
@@ -96,7 +98,11 @@ const RequestTableColumns = (
     {
       header: "Edit",
       cell: ({ row }) => (
-        <Button variant="outline" size="sm" onClick={() => editRow(row)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => editRow(row)}
+        >
           Edit
         </Button>
       ),

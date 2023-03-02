@@ -1,9 +1,9 @@
 import { FormControl, FormLabel } from "@chakra-ui/react";
-import React, { ReactNode } from "react";
+import React, { ChangeEvent, ReactNode } from "react";
 import { Select as ChakraSelect } from "@chakra-ui/react";
 
 interface Props {
-  value?: string | number;
+  value?: string | number;
   onChange: Function;
   name?: string;
   children?: ReactNode;

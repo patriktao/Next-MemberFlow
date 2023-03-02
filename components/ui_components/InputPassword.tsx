@@ -7,7 +7,7 @@ import {
   Input,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import React, { FunctionComponent } from "react";
+import React, { ChangeEvent, FunctionComponent } from "react";
 
 interface Props {
   errorMessage: string;
@@ -29,7 +29,7 @@ const InputPassword: React.FC<Props> = (props: Props) => {
           type="password"
           value={props.value}
           placeholder="Enter password..."
-          onChange={(e) => {
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
             props.setPassword(e);
           }}
           isRequired

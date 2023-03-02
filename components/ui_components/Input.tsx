@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ChangeEvent, ReactNode } from "react";
 import { FormControl, FormLabel, Input as ChakraInput } from "@chakra-ui/react";
 
 interface Props {
@@ -23,7 +23,7 @@ const Input: React.FC<Props> = (props: Props) => {
         name={props.name || ""}
         placeholder={props.placeholder || ""}
         isRequired={props.isRequired || false}
-        onChange={(e) => props.onChange(e)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => props.onChange(e)}
         size={props.size || "md"}
         type={props.type || ""}
       />
