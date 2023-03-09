@@ -1,6 +1,3 @@
-import { useToast } from "@chakra-ui/react";
-import { FunctionComponent } from "react";
-
 interface ToastProps {
   title: string;
   description?: string;

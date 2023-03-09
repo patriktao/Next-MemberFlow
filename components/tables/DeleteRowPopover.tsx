@@ -10,16 +10,13 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
-import type { DocumentData } from "firebase/firestore";
-import { Row } from "@tanstack/react-table";
 import Spinner from "../ui_components/Spinner";
 
 type Props = {
   children?: ReactNode;
-  selectedRows: Row<DocumentData>[];
   handleDelete: Function;
   isDisabled: boolean;
-  isLoading: boolean;
+  isDeleting: boolean;
   variant?: string;
   isOpen: boolean;
   setOpen: Function;
@@ -33,8 +30,8 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
           onClick={() => props.setOpen(!props.isOpen)}
           isDisabled={props.isDisabled}
           variant={props.variant ?? "outline"}
-          colorScheme={props.isLoading || !props.isDisabled ? "red" : "gray"}
-          isLoading={props.isLoading}
+          colorScheme={props.isDeleting || !props.isDisabled ? "red" : "gray"}
+          isLoading={props.isDeleting}
           spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
         >
           {props.children}
@@ -57,7 +54,7 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
             _hover={{ background: "red.50" }}
             onClick={() => {
               props.setOpen(false);
-              props.handleDelete(props.selectedRows);
+              props.handleDelete();
             }}
           >
             delete

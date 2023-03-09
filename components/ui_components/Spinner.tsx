@@ -1,4 +1,3 @@
-import React, { FunctionComponent } from "react";
 import { Spinner as ChakraSpinner } from "@chakra-ui/react";
 
 interface Props {

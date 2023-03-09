@@ -27,12 +27,12 @@ import {
 } from "@chakra-ui/react";
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
-import { createNewRequest } from "../../pages/api/requestAPI/requestAPI";
-import { membershipPeriods, paymentMethods } from "../../utils/payment-methods";
-import InputEmail from "../ui_components/InputEmail";
-import LoadingButton from "../ui_components/LoadingButton";
-import displayToast from "../ui_components/Toast";
-import Info from "./DataInfo";
+import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
+import { membershipPeriods, paymentMethods } from "../../../utils/payment-methods";
+import InputEmail from "../../ui_components/InputEmail";
+import LoadingButton from "../../ui_components/LoadingButton";
+import displayToast from "../../ui_components/Toast";
+import GDPR from "./GDPR/GDPR";
 
 interface Props {
   onCancel: Function;
@@ -97,8 +97,8 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       hasPaid: "no",
     };
 
-    setTimeout(() => {
-      createNewRequest(requestForm)
+    setTimeout(async () => {
+      await createNewRequest(requestForm)
         .then(() => {
           console.log("Created a new request.");
           displayToast({
@@ -130,7 +130,7 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       <ModalContent>
         <ModalHeader>Storing of your information!</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>{Info}</ModalBody>
+        <ModalBody>{GDPR}</ModalBody>
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={onClose}>
             Close
