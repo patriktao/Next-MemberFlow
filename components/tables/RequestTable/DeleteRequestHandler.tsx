@@ -21,12 +21,10 @@ function deleteRequestHandler({
 
     const promises = selectedRows.flatMap((e) => {
       //Promise for every delete
-      return new Promise(async (resolve, reject) => {
-        setTimeout(async () => {
-          await deleteRequest(e.original.requestId)
-            .then((res) => resolve(res))
-            .catch((error) => reject(error));
-        }, 1000);
+      return new Promise((resolve, reject) => {
+        deleteRequest(e.original.requestId)
+          .then((res) => resolve(res))
+          .catch((error) => reject(error));
       });
     });
 
@@ -40,7 +38,6 @@ function deleteRequestHandler({
 
   deletePromise.then(
     (res) => {
-      console.log(res);
       displayToast({
         toast: toast,
         title: "Successfully removed requests.",

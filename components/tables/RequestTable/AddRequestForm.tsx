@@ -28,7 +28,10 @@ import {
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
 import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
-import { membershipPeriods, paymentMethods } from "../../../utils/payment-methods";
+import {
+  membershipPeriods,
+  paymentMethods,
+} from "../../../utils/payment-methods";
 import InputEmail from "../../ui_components/InputEmail";
 import LoadingButton from "../../ui_components/LoadingButton";
 import displayToast from "../../ui_components/Toast";
@@ -82,7 +85,7 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
     setReadInfo(false);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     const requestForm = {
@@ -97,30 +100,28 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       hasPaid: "no",
     };
 
-    setTimeout(async () => {
-      await createNewRequest(requestForm)
-        .then(() => {
-          console.log("Created a new request.");
-          displayToast({
-            toast: toast,
-            title: "Successfully added a new request.",
-            status: "success",
-            position: "right-top",
-          });
-          props.onCancel();
-          resetForm();
-        })
-        .catch((error) => {
-          setErrorMessage(error.message);
-          displayToast({
-            toast: toast,
-            title: "Error adding a new request.",
-            description: error.message,
-            status: "error",
-          });
+    await createNewRequest(requestForm)
+      .then(() => {
+        console.log("Created a new request.");
+        displayToast({
+          toast: toast,
+          title: "Successfully added a new request.",
+          status: "success",
+          position: "right-top",
         });
-      setLoading(false);
-    }, 500);
+        props.onCancel();
+        resetForm();
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+        displayToast({
+          toast: toast,
+          title: "Error adding a new request.",
+          description: error.message,
+          status: "error",
+        });
+      });
+    setLoading(false);
   };
 
   /* Components */

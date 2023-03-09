@@ -53,39 +53,33 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
 
   const toast = useToast();
 
-  const handleSave: Function = useCallback(
-    (e): void => {
-      try {
-        e.preventDefault();
-        if (isChanged) {
-          setLoading(true);
-          setTimeout(() => {
-            updateRequest(state)
-              .then(() => {
-                console.log("Edited request");
-                displayToast({
-                  toast: toast,
-                  title: "Successfully edit the request.",
-                  status: "success",
-                  position: "right-top",
-                });
-                row = state;
-                onClose();
-              })
-              .catch((error) => {
-                setErrorMessage(error.message);
-                displayToast({
-                  toast: toast,
-                  title: "Error editing the request.",
-                  description: error.message,
-                  status: "error",
-                });
-              });
-            setLoading(false);
-          }, 500);
-        }
-      } catch (error) {
-        console.error(error);
+  const handleSave = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (isChanged) {
+        setLoading(true);
+        await updateRequest(state)
+          .then(() => {
+            console.log("Edited request");
+            displayToast({
+              toast: toast,
+              title: "Successfully edit the request.",
+              status: "success",
+              position: "right-top",
+            });
+            row = state;
+            onClose();
+          })
+          .catch((error) => {
+            setErrorMessage(error.message);
+            displayToast({
+              toast: toast,
+              title: "Error editing the request.",
+              description: error.message,
+              status: "error",
+            });
+          });
+        setLoading(false);
       }
     },
     [state]

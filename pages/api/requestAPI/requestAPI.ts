@@ -10,9 +10,9 @@ import {
 import { db } from "../firebase";
 import { v4 } from "uuid";
 import { RequestForm } from "../../../interfaces";
+import { callWithTimeout } from "../../../utils";
 
 const requestCollection = collection(db, "requests");
-
 
 /* NOT USED RN */
 export function fetchRequests(
@@ -62,21 +62,20 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
   try {
     console.log(form);
     const uid = v4();
-    return new Promise((resolve) => {
-      setDoc(doc(requestCollection, uid), {
-        requestId: uid,
-        regDate: form.regDate,
-        name: form.name,
-        email: form.email,
-        ssn: form.ssn,
-        gender: form.gender,
-        period: form.period,
-        hasPaid: form.hasPaid,
-        payMethod: form.payMethod,
-        afMember: form.afMember,
-      });
-      resolve();
-    });
+    const createForm = {
+      requestId: uid,
+      regDate: form.regDate,
+      name: form.name,
+      email: form.email,
+      ssn: form.ssn,
+      gender: form.gender,
+      period: form.period,
+      hasPaid: form.hasPaid,
+      payMethod: form.payMethod,
+      afMember: form.afMember,
+    };
+    const createAttempt = setDoc(doc(requestCollection, uid), createForm);
+    await callWithTimeout(createAttempt, 3000, "Create request timed out");
   } catch (error) {
     console.error(error);
     throw Error("could not create new request.");
@@ -84,17 +83,14 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
 }
 
 export async function deleteRequest(requestId: string): Promise<void> {
-  try {
-    return await deleteDoc(doc(requestCollection, requestId));
-  } catch (error) {
-    console.error(error);
-    throw Error("could not delete requests.");
-  }
+  let deleteAttempt = deleteDoc(doc(requestCollection, requestId));
+  await callWithTimeout(deleteAttempt, 6000, "Delete request timed out");
 }
 
 export async function updateRequest(form: RequestForm): Promise<void> {
   try {
-    return await updateDoc(doc(requestCollection, form.requestId), {
+    console.log(form);
+    const updateForm = {
       name: form.name,
       email: form.email,
       ssn: form.ssn,
@@ -104,7 +100,12 @@ export async function updateRequest(form: RequestForm): Promise<void> {
       payMethod: form.payMethod,
       afMember: form.afMember,
       regDate: form.regDate,
-    });
+    };
+    let updateAttempt = updateDoc(
+      doc(requestCollection, form.requestId),
+      updateForm
+    );
+    await callWithTimeout(updateAttempt, 3000, "Update request timed out");
   } catch (error) {
     console.error(error);
     throw Error("could not update request.");
