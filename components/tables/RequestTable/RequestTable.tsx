@@ -45,9 +45,10 @@ import deleteRequestHandler from "./DeleteRequestHandler";
 import RequestTableOptions from "./RequestTableOptions";
 import { DummyData } from "./DummyData";
 import { db } from "../../../pages/api/firebase";
+import ExportCSV from "../../csv/ExportCSV";
 
 const RequestTable: React.FC = () => {
-  const [data, setData] = useState<DocumentData[]>([]);
+  const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
   const prevData = useRef<DocumentData[]>([]);
   const [tableData, setTableData] = useState<DocumentData[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -103,7 +104,7 @@ const RequestTable: React.FC = () => {
           }
         });
         prevData.current = requests;
-        setData(requests);
+        setFetchedData(requests);
         setTableData(requests);
       });
     }
@@ -164,9 +165,9 @@ const RequestTable: React.FC = () => {
 
   /* FORMAT */
   function formatData(searchTerm: string): void {
-    let filteredData = data;
+    let filteredData = fetchedData;
     if (searchTerm.length !== 0) {
-      filteredData = data.filter(
+      filteredData = fetchedData.filter(
         (document: DocumentData) =>
           document.name.toLowerCase().includes(searchTerm) ||
           document.email.toLowerCase().includes(searchTerm) ||
@@ -209,7 +210,16 @@ const RequestTable: React.FC = () => {
         </MenuButton>
         <MenuList>
           <MenuItem>Import CSV</MenuItem>
-          <MenuItem>Export to CSV</MenuItem>
+          <MenuItem>
+            <ExportCSV
+              data={
+                selectedRows.length == 0
+                  ? tableData
+                  : selectedRows.flatMap((row) => row.original)
+              }
+              fileName="requests"
+            />
+          </MenuItem>
         </MenuList>
       </Menu>
     </>
@@ -301,7 +311,7 @@ const RequestTable: React.FC = () => {
         formatData={formatData}
         tableData={tableData}
         rowsSelected={rowsSelected}
-        options={TableOptionButtons}
+        buttons={TableOptionButtons}
       />
       <Flex overflowY="auto">{TableComponent}</Flex>
       <RequestTableFooter table={table} selectedRows={selectedRows} />

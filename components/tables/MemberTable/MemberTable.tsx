@@ -29,7 +29,6 @@ import {
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import type { DocumentData } from "firebase/firestore";
@@ -91,22 +90,6 @@ export function MemberTable() {
   });
 
   return (
-    <Box>
-      <Flex marginBottom={"8px"}>
-        <Spacer />
-        <Box>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              actions
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Download to CSV</MenuItem>
-              <MenuItem>Import to CSV</MenuItem>
-              <MenuItem>Delete</MenuItem>
-            </MenuList>
-          </Menu>
-        </Box>
-      </Flex>
       <Table size="sm">
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -154,6 +137,5 @@ export function MemberTable() {
           ))}
         </Tbody>
       </Table>
-    </Box>
   );
 }

@@ -8,7 +8,7 @@ interface Props {
   tableData: DocumentData[];
   rowsSelected: boolean;
   table: Table<DocumentData>;
-  options: ReactNode;
+  buttons: ReactNode;
 }
 
 const RequestTableOptions = (props: Props) => {
@@ -35,7 +35,7 @@ const RequestTableOptions = (props: Props) => {
             }}
           />
         </ButtonGroup>
-        <ButtonGroup marginLeft="0.5rem">{props.options}</ButtonGroup>
+        <ButtonGroup marginLeft="0.5rem">{props.buttons}</ButtonGroup>
       </Flex>
     </Flex>
   );
