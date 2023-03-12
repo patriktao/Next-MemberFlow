@@ -1,6 +1,14 @@
-import { Flex, ButtonGroup, Button, Box, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  ButtonGroup,
+  Button,
+  Box,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { Row, Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
+import Alert from "../../ui_components/Alert";
 import { IndeterminateCheckbox } from "./RequestTableColumns";
 
 interface Props {
@@ -9,6 +17,8 @@ interface Props {
 }
 
 const RequestTableFooter = ({ selectedRows, table }: Props) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Flex
       gap={"1rem"}
@@ -27,6 +37,19 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
         />
         <Box>Selected: {selectedRows.length}</Box>
       </Flex>
+      <Button
+        colorScheme="teal"
+        isDisabled={selectedRows.length === 0}
+        onClick={onOpen}
+      >
+        Accept Requests
+      </Button>
+      <Alert
+        isOpen={isOpen}
+        onClose={onClose}
+        header={"Accept Requests"}
+        body={"Are you sure? You can't undo this action afterwards."}
+      />
       <Flex gridAutoFlow={"column"} columnGap="1rem">
         <Box flexDirection="row">
           Page

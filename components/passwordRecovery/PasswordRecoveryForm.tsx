@@ -9,8 +9,6 @@ import {
 } from "@chakra-ui/react";
 import {
   ChangeEvent,
-  FunctionComponent,
-  SyntheticEvent,
   useState,
 } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";

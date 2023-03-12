@@ -70,44 +70,43 @@ const RequestTable: React.FC = () => {
   );
 
   const unsub = useCallback((isMounting) => {
-    setTimeout(async () => {
-      if (isMounting) {
-        await onSnapshot(collection(db, "requests"), (snapshot) => {
-          let requests = prevData.current.map((x) => x);
-          snapshot.docChanges().forEach((change) => {
-            const personData = change.doc.data();
-            const personId = personData.requestId;
-            switch (change.type) {
-              case "added":
-                if (
-                  !requests.find(
-                    (member: DocumentData) => member.requestId === personId
-                  )
-                ) {
-                  requests.push(personData);
-                }
-                break;
-              case "removed":
-                requests = requests.filter(
-                  (member: DocumentData) => member.requestId !== personId
-                );
-                break;
-              case "modified":
-                requests = requests.filter(
-                  (member: DocumentData) => member.requestId !== personId
-                );
+    if (isMounting) {
+      onSnapshot(collection(db, "requests"), (snapshot) => {
+        let requests = prevData.current.map((x) => x);
+        snapshot.docChanges().forEach(({ doc, type }) => {
+          const personData = doc.data();
+          switch (type) {
+            case "added":
+              if (
+                !requests.some(
+                  (member) => member.requestId === personData.requestId
+                )
+              ) {
                 requests.push(personData);
-                break;
-              default:
-                break;
-            }
-          });
-          prevData.current = requests;
-          setData(requests);
-          setTableData(requests);
+              }
+              break;
+            case "removed":
+              requests = requests.filter(
+                (member: DocumentData) =>
+                  member.requestId !== personData.requestId
+              );
+              break;
+            case "modified":
+              requests = requests.filter(
+                (member: DocumentData) =>
+                  member.requestId !== personData.requestId
+              );
+              requests.push(personData);
+              break;
+            default:
+              break;
+          }
         });
-      }
-    }, 1000);
+        prevData.current = requests;
+        setData(requests);
+        setTableData(requests);
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -223,14 +222,7 @@ const RequestTable: React.FC = () => {
   }
 
   const TableComponent = (
-    <Table
-      size="sm"
-      {...{
-        style: {
-          width: table.getCenterTotalSize(),
-        },
-      }}
-    >
+    <Table size="sm">
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>

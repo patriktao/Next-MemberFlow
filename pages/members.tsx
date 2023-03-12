@@ -1,14 +1,20 @@
+import { Grid, Heading } from "@chakra-ui/react";
 import React from "react";
 import withAuth from "../components/auth/withAuth";
 import Layout from "../components/Layout";
-import { MemberTable } from "../components/tables/MemberTable";
+import { MemberTable } from "../components/tables/MemberTable/MemberTable";
 
 type Props = {};
 
 function members({}: Props) {
   return (
     <Layout title="Members">
-      <MemberTable />
+      <Heading as="h1" size="lg" paddingBottom="1rem">
+        members.
+      </Heading>
+      <Grid>
+        <MemberTable />
+      </Grid>
     </Layout>
   );
 }
