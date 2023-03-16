@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
+const db = admin.firestore();
 
 async function grantAdminRole(email){
     //Fetches the user. 
@@ -17,9 +18,17 @@ async function grantAdminRole(email){
     admin.auth().setCustomUserClaims(user.uid, {
         admin:true
     })
+    addAdminEntry(email);
     return {
         status:`Succesfully addeed ${email} as admin.`
     }
+}
+
+//Adds the admin associated with the email to a collection for keeping track of all admins.
+async function addAdminEntry(email){
+    db.collection("admins").add({
+        email:email
+    })
 }
 
 exports.addAdmin = functions.region("europe-central2").https.onCall((data, context) => {
