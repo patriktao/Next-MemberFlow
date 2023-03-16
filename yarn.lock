@@ -1843,7 +1843,7 @@ caniuse-lite@^1.0.30001406:
 
 chakra-dayzed-datepicker@^0.2.7:
   version "0.2.7"
-  resolved "https://registry.npmjs.org/chakra-dayzed-datepicker/-/chakra-dayzed-datepicker-0.2.7.tgz"
+  resolved "https://registry.yarnpkg.com/chakra-dayzed-datepicker/-/chakra-dayzed-datepicker-0.2.7.tgz#12ff4b669bb9b44b7a2cb5de5b139cacfabdf9fb"
   integrity sha512-kmKx0Bvyw7XrrOm+kIJVAVUy2L9IWmuz0oQpPcBfI5A3l2BLXASPSBdlbwbHi6tSHNprW7lxY8K2xWytNUkjlw==
   dependencies:
     react-focus-lock "^2.9.2"
