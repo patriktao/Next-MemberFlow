@@ -42,7 +42,9 @@ const AuthForm: React.FC<Props> = (props: Props) => {
           title: "Successfully logged in.",
           status: "success",
         });
+
         router.push("/dashboard");
+        //router.push("/profile");
         setLoading(false);
       })
       .catch((error) => {

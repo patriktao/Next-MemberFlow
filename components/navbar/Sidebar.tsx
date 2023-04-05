@@ -49,6 +49,9 @@ const Sidebar: React.FC = () => {
       case "/settings":
         setSelectedNavItem("/settings");
         break;
+      case "/profile":
+        setSelectedNavItem("/profile");
+        break;
       default:
         break;
     }
@@ -126,6 +129,14 @@ const Sidebar: React.FC = () => {
           description={undefined}
           active={selectedNavItem === "/archived"}
           path="/archived"
+        />
+        <NavItem
+          navSize={navSize}
+          icon={FiUser}
+          title="My Profile"
+          description={undefined}
+          active={selectedNavItem === "/profile"}
+          path="/profile"
         />
       </Flex>
 
