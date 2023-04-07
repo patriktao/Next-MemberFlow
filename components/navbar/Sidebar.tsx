@@ -11,7 +11,7 @@ import {
   MenuList,
   useToast,
 } from "@chakra-ui/react";
-import { FiMenu, FiHome, FiCalendar, FiUser } from "react-icons/fi";
+import { FiMenu, FiHome, FiCalendar, FiUser, FiKey } from "react-icons/fi";
 import NavItem from "./NavItem";
 import { component_color } from "../../styles/colors";
 import { useRouter } from "next/router";
@@ -49,6 +49,8 @@ const Sidebar: React.FC = () => {
       case "/settings":
         setSelectedNavItem("/settings");
         break;
+      case "/admins":
+        setSelectedNavItem("/admins");
       default:
         break;
     }
@@ -126,6 +128,14 @@ const Sidebar: React.FC = () => {
           description={undefined}
           active={selectedNavItem === "/archived"}
           path="/archived"
+        />
+        <NavItem
+          navSize={navSize}
+          icon={FiKey}
+          title="Admins"
+          description={undefined}
+          active={selectedNavItem === "/admins"}
+          path="/admins"
         />
       </Flex>
 
