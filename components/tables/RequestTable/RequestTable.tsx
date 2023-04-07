@@ -7,20 +7,14 @@ import {
   Th,
   Td,
   chakra,
-  Box,
-  Heading,
   Flex,
   Button,
-  Spacer,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  ButtonGroup,
   useDisclosure,
-  Input,
   useToast,
-  Tfoot,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -34,102 +28,130 @@ import {
   SortingState,
   getSortedRowModel,
   Row,
+  PaginationState,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
-import AddRequestModal from "../../request/AddRequestModal";
+import AddRequestModal from "./AddRequestModal";
 import { hover_color } from "../../../styles/colors";
-import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
-import displayToast from "../../ui_components/Toast";
+import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
 import DeleteRowPopover from "../DeleteRowPopover";
-import { db } from "../../../pages/api/firebase";
 import RequestTableColumns from "./RequestTableColumns";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import FormModal from "../../ui_components/FormModal";
+import RequestTableFooter from "./RequestTableFooter";
+import deleteRequestHandler from "./DeleteRequestHandler";
+import RequestTableOptions from "./RequestTableOptions";
+import { DummyData } from "./DummyData";
+import { db } from "../../../pages/api/firebase";
+import ExportCSV from "../../csv/ExportCSV";
 
 const RequestTable: React.FC = () => {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [data, setData] = useState<DocumentData[]>([]);
+  const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
   const prevData = useRef<DocumentData[]>([]);
   const [tableData, setTableData] = useState<DocumentData[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
   const [isDeleting, setDeleting] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 12,
+  });
 
-  const unsub = useCallback(async (isMounting) => {
+  const pagination = React.useMemo(
+    () => ({
+      pageIndex,
+      pageSize,
+    }),
+    [pageIndex, pageSize]
+  );
+
+  const unsub = useCallback((isMounting) => {
     if (isMounting) {
-      await onSnapshot(collection(db, "requests"), (snapshot) => {
+      onSnapshot(collection(db, "requests"), (snapshot) => {
         let requests = prevData.current.map((x) => x);
-        snapshot.docChanges().forEach(
-          (change) => {
-            const personData = change.doc.data();
-            const personId = personData.requestId;
-            switch (change.type) {
-              case "added":
-                if (
-                  !requests.find(
-                    (member: DocumentData) => member.requestId === personId
-                  )
-                ) {
-                  requests.push(personData);
-                }
-                break;
-              case "removed":
-                requests = requests.filter(
-                  (member: DocumentData) => member.requestId !== personId
-                );
-                break;
-              case "modified":
-                requests = requests.filter(
-                  (member: DocumentData) => member.requestId !== personId
-                );
+        snapshot.docChanges().forEach(({ doc, type }) => {
+          const personData = doc.data();
+          switch (type) {
+            case "added":
+              if (
+                !requests.some(
+                  (member) => member.requestId === personData.requestId
+                )
+              ) {
                 requests.push(personData);
-                break;
-              default:
-                break;
-            }
-          },
-          (error) => {
-            console.error(error);
+              }
+              break;
+            case "removed":
+              requests = requests.filter(
+                (member: DocumentData) =>
+                  member.requestId !== personData.requestId
+              );
+              break;
+            case "modified":
+              requests = requests.filter(
+                (member: DocumentData) =>
+                  member.requestId !== personData.requestId
+              );
+              requests.push(personData);
+              break;
+            default:
+              break;
           }
-        );
+        });
         prevData.current = requests;
-        setData(prevData.current);
-        setTableData(prevData.current);
-        console.log(prevData.current);
+        setFetchedData(requests);
+        setTableData(requests);
       });
     }
   }, []);
 
   useEffect(() => {
     let isMounting = true;
-
     unsub(isMounting);
-
     return () => {
       isMounting = false;
     };
   }, [unsub]);
 
+  /* EDIT */
+  const editRow = useCallback(
+    (row): void => {
+      setEditingRow(row.original);
+    },
+    [editingRow]
+  );
+
+  const closeEdit = useCallback((): void => {
+    setEditingRow(null);
+  }, [editingRow]);
+
+  /* TABLE */
   const table = useReactTable({
-    columns: RequestTableColumns,
+    columns: RequestTableColumns(editRow),
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       rowSelection,
+      pagination,
     },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
   });
 
   /* Conditions */
   const selectedRows: Row<DocumentData>[] =
     table.getSelectedRowModel().flatRows;
+
   const rowsSelected: boolean = selectedRows.length > 0;
 
   /* Checks if Row is Selected */
@@ -143,9 +165,9 @@ const RequestTable: React.FC = () => {
 
   /* FORMAT */
   function formatData(searchTerm: string): void {
-    let filteredData = data;
+    let filteredData = fetchedData;
     if (searchTerm.length !== 0) {
-      filteredData = data.filter(
+      filteredData = fetchedData.filter(
         (document: DocumentData) =>
           document.name.toLowerCase().includes(searchTerm) ||
           document.email.toLowerCase().includes(searchTerm) ||
@@ -157,61 +179,59 @@ const RequestTable: React.FC = () => {
 
   const toast = useToast();
 
-  /* DELETE */
-  const handleDelete = useCallback(
-    (selectedRows: Row<DocumentData>[]): void => {
-      const deletePromise = new Promise((resolve, reject) => {
-        setDeleting(true);
-        selectedRows.flatMap((e) => {
-          setTimeout(() => {
-            deleteRequest(e.original.requestId)
-              .then(resolve)
-              .catch((error) => {
-                console.error(error);
-                setDeleting(false);
-                reject();
-              });
-          }, 1000);
-        });
-      });
+  const handleDelete = useCallback(() => {
+    deleteRequestHandler({
+      selectedRows: selectedRows,
+      setDeleting: setDeleting,
+      resetRowSelection: () => table.resetRowSelection(),
+      toast: toast,
+    });
+  }, [selectedRows]);
 
-      deletePromise
-        .then(() => {
-          displayToast({
-            toast: toast,
-            title: "Successfully removed requests.",
-            status: "success",
-            position: "top-right",
-          });
-          table.resetRowSelection();
-          setDeleting(false);
-        })
-        .catch((error) => {
-          console.error(error);
-          displayToast({
-            toast: toast,
-            title: "Error removing requests.",
-            status: "error",
-            position: "top-right",
-          });
-          setDeleting(false);
-        });
-    },
-    [selectedRows]
-  );
-  /* EDIT */
-  const editRow = useCallback(
-    (row): void => {
-      setEditingRow(row.original);
-    },
-    [editingRow]
+  const TableOptionButtons = (
+    <>
+      <Button colorScheme="teal" onClick={onOpen}>
+        add
+      </Button>
+      <AddRequestModal isOpen={isOpen} onClose={onClose} />
+      <DeleteRowPopover
+        handleDelete={handleDelete}
+        isDisabled={!rowsSelected}
+        isDeleting={isDeleting}
+        isOpen={isPopoverOpen}
+        setOpen={setPopoverOpen}
+      >
+        delete
+      </DeleteRowPopover>
+      <Button onClick={createTestData}>test data</Button>
+      <Menu>
+        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+          actions
+        </MenuButton>
+        <MenuList>
+          <MenuItem>Import CSV</MenuItem>
+          <MenuItem>
+            <ExportCSV
+              data={
+                selectedRows.length == 0
+                  ? tableData
+                  : selectedRows.flatMap((row) => row.original)
+              }
+              fileName="requests"
+            />
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </>
   );
 
-  const closeEdit = useCallback((): void => {
-    setEditingRow(null);
-  }, [editingRow]);
+  function createTestData() {
+    DummyData.forEach(async (form) => {
+      await createNewRequest(form);
+    });
+  }
 
-  const TableView = (
+  const TableComponent = (
     <Table size="sm">
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
@@ -267,15 +287,6 @@ const RequestTable: React.FC = () => {
                   </>
                 );
               })}
-              <Td background={isRowSelected(row) ? hover_color : ""}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => editRow(row)}
-                >
-                  Edit
-                </Button>
-              </Td>
             </Tr>
             {editingRow && editingRow.requestId === row.original.requestId && (
               <FormModal
@@ -290,68 +301,21 @@ const RequestTable: React.FC = () => {
           </>
         ))}
       </Tbody>
-      <Tfoot>
-        <Tr>
-          <Th colSpan={10}>Selected: {selectedRows.length}</Th>
-        </Tr>
-      </Tfoot>
     </Table>
   );
 
   return (
-    <Box>
-      <Flex marginBottom={"8px"}>
-        <Box>
-          <Heading as="h3" size="md">
-            requests ({tableData.length ?? 0})
-          </Heading>
-        </Box>
-        <Spacer />
-        <Flex columnGap={"0.5rem"}>
-          <Button
-            variant="outline"
-            colorScheme="teal"
-            isDisabled={!rowsSelected}
-            onClick={() => table.resetRowSelection()}
-          >
-            deselect
-          </Button>
-          <Input
-            placeholder="search here..."
-            w="300px"
-            onChange={(e) => {
-              formatData(e.target.value.toLowerCase());
-            }}
-          />
-          <ButtonGroup>
-            <Button colorScheme="teal" onClick={onOpen}>
-              add
-            </Button>
-            <AddRequestModal isOpen={isOpen} onClose={onClose} />
-            <DeleteRowPopover
-              selectedRows={selectedRows}
-              handleDelete={handleDelete}
-              isDisabled={!rowsSelected}
-              isLoading={isDeleting}
-              isOpen={isPopoverOpen}
-              setOpen={setPopoverOpen}
-            >
-              delete
-            </DeleteRowPopover>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                actions
-              </MenuButton>
-              <MenuList>
-                <MenuItem>Import CSV</MenuItem>
-                <MenuItem>Export to CSV</MenuItem>
-              </MenuList>
-            </Menu>
-          </ButtonGroup>
-        </Flex>
-      </Flex>
-      {TableView}
-    </Box>
+    <>
+      <RequestTableOptions
+        table={table}
+        formatData={formatData}
+        tableData={tableData}
+        rowsSelected={rowsSelected}
+        buttons={TableOptionButtons}
+      />
+      <Flex overflowY="auto">{TableComponent}</Flex>
+      <RequestTableFooter table={table} selectedRows={selectedRows} />
+    </>
   );
 };
 

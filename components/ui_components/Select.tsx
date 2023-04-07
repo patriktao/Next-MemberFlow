@@ -3,7 +3,7 @@ import React, { ReactNode } from "react";
 import { Select as ChakraSelect } from "@chakra-ui/react";
 
 interface Props {
-  value?: string;
+  value?: string | number;
   onChange: Function;
   name?: string;
   children?: ReactNode;

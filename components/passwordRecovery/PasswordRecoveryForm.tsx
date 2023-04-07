@@ -7,7 +7,10 @@ import {
   Spinner,
   Stack,
 } from "@chakra-ui/react";
-import { FunctionComponent, useState } from "react";
+import {
+  ChangeEvent,
+  useState,
+} from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { userAuth } from "../../pages/api/firebase";
 import InputEmail from "../ui_components/InputEmail";
@@ -15,10 +18,10 @@ import InputEmail from "../ui_components/InputEmail";
 type Props = {};
 
 const PasswordRecoveryForm: React.FC<Props> = (props: Props) => {
-  const [email, setEmail] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
 
   const emailError = email === "";
 
@@ -42,8 +45,10 @@ const PasswordRecoveryForm: React.FC<Props> = (props: Props) => {
       <Stack spacing="4">
         <InputEmail
           errorMessage={errorMessage}
-          setEmail={setEmail}
-          setErrorMessage={setErrorMessage}
+          setEmail={(e: ChangeEvent<HTMLInputElement>) => {
+            setEmail(e.target.value);
+            setErrorMessage("");
+          }}
           emailError={emailError}
           value={email}
         ></InputEmail>

@@ -1,5 +1,5 @@
-import { Box, forwardRef, Tag, Tooltip } from "@chakra-ui/react";
-import { FunctionComponent, ReactNode } from "react";
+import { Tooltip } from "@chakra-ui/react";
+import { ReactNode } from "react";
 
 interface Props {
   children?: ReactNode;

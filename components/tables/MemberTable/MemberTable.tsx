@@ -29,16 +29,14 @@ import {
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import type { DocumentData } from "firebase/firestore";
-import { getTimestamp } from "../../utils/date-utils";
-import { db } from "../../pages/api/firebase";
+import { db } from "../../../pages/api/firebase";
+import { columns } from "./MemberTableColumns";
 
 export function MemberTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const columnHelper = createColumnHelper<DocumentData>();
   const [data, setData] = useState<DocumentData[]>([]);
   const prevData = useRef<DocumentData[]>([]);
 
@@ -80,46 +78,8 @@ export function MemberTable() {
     unsub();
   }, []);
 
-  const columns = [
-    columnHelper.accessor("name", {
-      cell: (info) => info.getValue(),
-      header: "Name",
-    }),
-    columnHelper.accessor("ssn", {
-      cell: (info) => info.getValue(),
-      header: "SSN",
-    }),
-    columnHelper.accessor("email", {
-      cell: (info) => info.getValue(),
-      header: "Email",
-      meta: {
-        isNumeric: true,
-      },
-    }),
-    columnHelper.accessor("gender", {
-      cell: (info) => info.getValue(),
-      header: "Gender",
-    }),
-    columnHelper.accessor("reg_date", {
-      cell: (info) => getTimestamp(info.getValue()),
-      header: "Reg Date",
-    }),
-    columnHelper.accessor("exp_date", {
-      cell: (info) => getTimestamp(info.getValue()),
-      header: "Exp Date",
-    }),
-    columnHelper.accessor("period", {
-      cell: (info) => info.getValue(),
-      header: "Period",
-    }),
-    columnHelper.accessor("status", {
-      cell: (info) => info.getValue(),
-      header: "Status",
-    }),
-  ];
-
   const table = useReactTable({
-    columns,
+    columns: columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -130,33 +90,11 @@ export function MemberTable() {
   });
 
   return (
-    <Box>
-      <Flex marginBottom={"8px"}>
-        <Box>
-          <Heading as="h1" size="lg" paddingBottom="1rem">
-            members.
-          </Heading>
-        </Box>
-        <Spacer />
-        <Box>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              actions
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Download to CSV</MenuItem>
-              <MenuItem>Import to CSV</MenuItem>
-              <MenuItem>Delete</MenuItem>
-            </MenuList>
-          </Menu>
-        </Box>
-      </Flex>
       <Table size="sm">
         <Thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                 const meta: any = header.column.columnDef.meta;
                 return (
                   <Th
@@ -168,7 +106,6 @@ export function MemberTable() {
                       header.column.columnDef.header,
                       header.getContext()
                     )}
-
                     <chakra.span pl="4">
                       {header.column.getIsSorted() ? (
                         header.column.getIsSorted() === "desc" ? (
@@ -200,6 +137,5 @@ export function MemberTable() {
           ))}
         </Tbody>
       </Table>
-    </Box>
   );
 }

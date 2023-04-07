@@ -36,11 +36,7 @@ const AuthForm: React.FC<Props> = (props: Props) => {
     e.preventDefault();
     setLoading(true);
     logIn(email, password)
-      .then((user) => {
-        console.log("Signed in as:", user);
-        setErrorMessage("");
-        setEmail("");
-        setPassword("");
+      .then(() => {
         displayToast({
           toast: toast,
           title: "Successfully logged in.",

@@ -1,6 +1,5 @@
 import {
   collection,
-  Timestamp,
   setDoc,
   doc,
   deleteDoc,
@@ -10,68 +9,60 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { v4 } from "uuid";
+import { RequestForm } from "../../../interfaces";
+import { callWithTimeout } from "../../../utils";
 
 const requestCollection = collection(db, "requests");
 
-interface RequestForm {
-  requestId?: string;
-  email: string;
-  name: string;
-  ssn: string;
-  period: string;
-  gender: string;
-  afMember: string;
-  payMethod: string;
-  regDate: Timestamp;
-  hasPaid: string;
-}
-
-export async function fetchRequests(
+/* NOT USED RN */
+export function fetchRequests(
   prevData: React.MutableRefObject<DocumentData[]>
 ): Promise<DocumentData[]> {
-  try {
-    let requests = prevData.current.map((x) => x);
-    await onSnapshot(collection(db, "requests"), (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        const personData = change.doc.data();
-        const personId = personData.requestId;
-        switch (change.type) {
-          case "added":
-            if (
-              !requests.find(
-                (member: DocumentData) => member.requestId === personId
-              )
-            ) {
+  return new Promise((resolve, reject) => {
+    try {
+      onSnapshot(collection(db, "requests"), (snapshot) => {
+        let requests = prevData.current.map((x) => x);
+        snapshot.docChanges().forEach((change) => {
+          const personData = change.doc.data();
+          const personId = personData.requestId;
+          switch (change.type) {
+            case "added":
+              if (
+                !requests.find(
+                  (member: DocumentData) => member.requestId === personId
+                )
+              ) {
+                requests.push(personData);
+              }
+              break;
+            case "removed":
+              requests = requests.filter(
+                (member: DocumentData) => member.requestId !== personId
+              );
+              break;
+            case "modified":
+              requests = requests.filter(
+                (member: DocumentData) => member.requestId !== personId
+              );
               requests.push(personData);
-            }
-            break;
-          case "removed":
-            requests = requests.filter(
-              (member: DocumentData) => member.requestId !== personId
-            );
-            break;
-          case "modified":
-            requests = requests.filter(
-              (member: DocumentData) => member.requestId !== personId
-            );
-            requests.push(personData);
-            break;
-          default:
-            break;
-        }
+              break;
+            default:
+              break;
+          }
+        });
+        resolve(requests);
       });
-    });
-    return requests;
-  } catch (error) {
-    console.error(error);
-  }
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 export async function createNewRequest(form: RequestForm): Promise<void> {
   try {
     console.log(form);
     const uid = v4();
-    return await setDoc(doc(requestCollection, uid), {
+    const createForm = {
       requestId: uid,
       regDate: form.regDate,
       name: form.name,
@@ -82,23 +73,24 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
       hasPaid: form.hasPaid,
       payMethod: form.payMethod,
       afMember: form.afMember,
-    });
+    };
+    const createAttempt = setDoc(doc(requestCollection, uid), createForm);
+    await callWithTimeout(createAttempt, 3000, "Create request timed out");
   } catch (error) {
     console.error(error);
+    throw Error("could not create new request.");
   }
 }
 
 export async function deleteRequest(requestId: string): Promise<void> {
-  try {
-    return await deleteDoc(doc(requestCollection, requestId));
-  } catch (error) {
-    console.error(error);
-  }
+  let deleteAttempt = deleteDoc(doc(requestCollection, requestId));
+  await callWithTimeout(deleteAttempt, 6000, "Delete request timed out");
 }
 
 export async function updateRequest(form: RequestForm): Promise<void> {
   try {
-    return await updateDoc(doc(requestCollection, form.requestId), {
+    console.log(form);
+    const updateForm = {
       name: form.name,
       email: form.email,
       ssn: form.ssn,
@@ -108,8 +100,14 @@ export async function updateRequest(form: RequestForm): Promise<void> {
       payMethod: form.payMethod,
       afMember: form.afMember,
       regDate: form.regDate,
-    });
+    };
+    let updateAttempt = updateDoc(
+      doc(requestCollection, form.requestId),
+      updateForm
+    );
+    await callWithTimeout(updateAttempt, 3000, "Update request timed out");
   } catch (error) {
     console.error(error);
+    throw Error("could not update request.");
   }
 }

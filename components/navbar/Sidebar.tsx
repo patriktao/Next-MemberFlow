@@ -78,13 +78,10 @@ const Sidebar: React.FC = () => {
 
   return (
     <Flex
-      pos="sticky"
       left="5"
-      h="95vh"
-      marginTop="2.5vh"
       boxShadow="0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)"
       borderRadius={navSize == "small" ? "15px" : "30px"}
-      w={navSize == "small" ? "75px" : "200px"}
+      w={navSize == "small" ? "75px" : "280px"}
       flexDir="column"
       justifyContent="space-between"
       backgroundColor={component_color}
@@ -150,7 +147,7 @@ const Sidebar: React.FC = () => {
         mb={4}
       >
         <Menu>
-          <MenuButton>
+          <MenuButton width="100%" display="grid" justifyContent="center">
             <Divider display={navSize == "small" ? "none" : "flex"} />
             <Flex mt={4} align="center">
               <Avatar size="sm" src="avatar-1.jpg" />

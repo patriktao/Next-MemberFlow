@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Flex, Grid, useToast } from "@chakra-ui/react";
 import { DocumentData, Timestamp } from "firebase/firestore";
 import { isEqual } from "lodash";
-import { useCallback, useReducer, useState } from "react";
+import { ChangeEvent, useCallback, useReducer, useState } from "react";
 import { getTimestamp } from "../../../utils/date-utils";
 import {
   membershipPeriods,
@@ -53,39 +53,33 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
 
   const toast = useToast();
 
-  const handleSave: Function = useCallback(
-    (e): void => {
-      try {
-        e.preventDefault();
-        if (isChanged) {
-          setLoading(true);
-          setTimeout(() => {
-            updateRequest(state)
-              .then(() => {
-                console.log("Edited request");
-                displayToast({
-                  toast: toast,
-                  title: "Successfully edit the request.",
-                  status: "success",
-                  position: "right-top",
-                });
-                row = state;
-                onClose();
-              })
-              .catch((error) => {
-                setErrorMessage(error.message);
-                displayToast({
-                  toast: toast,
-                  title: "Error editing the request.",
-                  description: error.message,
-                  status: "error",
-                });
-              });
-            setLoading(false);
-          }, 500);
-        }
-      } catch (error) {
-        console.error(error);
+  const handleSave = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (isChanged) {
+        setLoading(true);
+        await updateRequest(state)
+          .then(() => {
+            console.log("Edited request");
+            displayToast({
+              toast: toast,
+              title: "Successfully edit the request.",
+              status: "success",
+              position: "right-top",
+            });
+            row = state;
+            onClose();
+          })
+          .catch((error) => {
+            setErrorMessage(error.message);
+            displayToast({
+              toast: toast,
+              title: "Error editing the request.",
+              description: error.message,
+              status: "error",
+            });
+          });
+        setLoading(false);
       }
     },
     [state]
@@ -105,14 +99,14 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             name="name"
             placeholder="Type full name"
             isRequired
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               handleChange(e);
               setErrorMessage("");
             }}
           />
           <InputEmail
             value={state.email}
-            setEmail={(e) => {
+            setEmail={(e: ChangeEvent<HTMLInputElement>) => {
               handleChange(e);
               setErrorMessage("");
             }}
@@ -132,7 +126,7 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             name="ssn"
             value={state.ssn}
             type="alphanumeric"
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               handleChange(e);
             }}
             maxLength={13}
@@ -206,21 +200,18 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             </option>
           </Select>
         </Grid>
-        <Flex justifyContent="space-between">
-          <Button variant="outline">Reset All</Button>
-          <ButtonGroup display="flex" justifyContent="flex-end">
-            <Button variant="outline" onClick={() => onClose()}>
-              Cancel
-            </Button>
-            <LoadingButton
-              color="teal"
-              isDisabled={!isChanged}
-              isLoading={isLoading}
-            >
-              Save
-            </LoadingButton>
-          </ButtonGroup>
-        </Flex>
+        <ButtonGroup display="flex" justifyContent="flex-end">
+          <Button variant="outline" onClick={() => onClose()}>
+            Cancel
+          </Button>
+          <LoadingButton
+            color="teal"
+            isDisabled={!isChanged}
+            isLoading={isLoading}
+          >
+            Save
+          </LoadingButton>
+        </ButtonGroup>
       </Flex>
     </form>
   );
