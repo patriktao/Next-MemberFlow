@@ -11,6 +11,7 @@ import displayToast from "../ui_components/Toast";
 type Props = {
   toast: Function;
   table: Table<DocumentData>;
+  onClose: Function;
 };
 
 type CloudFuncProp = {
@@ -45,6 +46,7 @@ const AddAdmin = (props: Props) => {
           position: "top-right",
         });
         setLoading(false);
+        props.onClose();
       })
       .catch((error) => {
         console.log(error);

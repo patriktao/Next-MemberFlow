@@ -25,7 +25,7 @@ const AddAdminModal = (props: Props) => {
         isOpen={props.isOpen}
         onClose={props.onClose}
         title="Add a new admin"
-        children={<AddAdmin toast={props.toast} table={props.table} />}
+        children={<AddAdmin onClose={props.onClose} toast={props.toast} table={props.table} />}
       ></FormModal>
     </>
   );
