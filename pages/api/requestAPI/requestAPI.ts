@@ -7,12 +7,19 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, fbFunctions } from "../firebase";
 import { v4 } from "uuid";
 import { RequestForm } from "../../../interfaces";
 import { callWithTimeout } from "../../../utils";
+import { httpsCallable } from "firebase/functions";
 
 const requestCollection = collection(db, "requests");
+
+export async function createUser(uid: string, email: string, password: string) {
+  const createUser = httpsCallable(fbFunctions, "createUser");
+  console.log("requestAPI uid: ", uid);
+  return createUser({ email: email, uid: uid, password: password });
+}
 
 /* NOT USED RN */
 export function fetchRequests(

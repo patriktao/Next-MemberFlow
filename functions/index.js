@@ -1,10 +1,33 @@
 const functions = require("firebase-functions");
+const auth = require("firebase/auth")
 const admin = require("firebase-admin");
 admin.initializeApp();
 const adminAPI = require("./adminAPI");
 const grantAdminRole = adminAPI.grantAdminRole;
 const stripAdminRole = adminAPI.stripAdminRole;
 
+//Creates an user without a password. The user get's to choose a password via link sent to email. 
+exports.createUser = functions.region("europe-central2").https.onCall((data, context) => {
+    if (!context.auth){
+        throw new functions.https.HttpsError("permission-denied", "Request not authorized. User not authorized.")
+    }
+
+    console.log(data.uid)
+
+    return admin.auth().createUser({
+        email: data.email,
+        uid: data.uid,
+        password: data.password
+    }).then((result) => {
+        return {
+            message: result
+        }
+    })
+    .catch((error) => {
+        throw new functions.https.HttpsError("Could not create a user: " + error.message);
+    })
+    
+});
 
 exports.addAdmin = functions.region("europe-central2").https.onCall((data, context) => {
     //Checks if the authenticated token has admin role.
