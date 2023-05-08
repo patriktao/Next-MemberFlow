@@ -82,7 +82,13 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
       afMember: form.afMember,
     };
     const createAttempt = setDoc(doc(requestCollection, uid), createForm);
+    const createUserAttempt = createUser(uid, form.email, form.ssn);
     await callWithTimeout(createAttempt, 3000, "Create request timed out");
+    await callWithTimeout(
+      createUserAttempt,
+      5000,
+      "Create user request timed out"
+    );
   } catch (error) {
     console.error(error);
     throw Error("could not create new request.");

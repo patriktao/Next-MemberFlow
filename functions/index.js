@@ -18,9 +18,9 @@ exports.createUser = functions.region("europe-central2").https.onCall((data, con
         email: data.email,
         uid: data.uid,
         password: data.password
-    }).then((result) => {
+    }).then((userRecord) => {
         return {
-            message: result
+            message: "Successfully created new user: " + userRecord.uid
         }
     })
     .catch((error) => {

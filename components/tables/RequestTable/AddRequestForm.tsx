@@ -104,29 +104,27 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       uid: uid,
     };
 
-    await createNewRequest(requestForm).then(() => {
-      createUser(requestForm.uid, requestForm.email, requestForm.ssn)
-        .then(() => {
-          console.log("RequestForm uid: ", requestForm.uid);
-          displayToast({
-            toast: toast,
-            title: "Successfully added a new request.",
-            status: "success",
-            position: "right-top",
-          });
-          props.onCancel();
-          resetForm();
-        })
-        .catch((error) => {
-          setErrorMessage(error.message);
-          displayToast({
-            toast: toast,
-            title: "Error adding a new request.",
-            description: error.message,
-            status: "error",
-          });
+    await createNewRequest(requestForm)
+      .then(() => {
+        console.log("RequestForm uid: ", requestForm.uid);
+        displayToast({
+          toast: toast,
+          title: "Successfully added a new request.",
+          status: "success",
+          position: "right-top",
         });
-    });
+        props.onCancel();
+        resetForm();
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+        displayToast({
+          toast: toast,
+          title: "Error adding a new request.",
+          description: error.message,
+          status: "error",
+        });
+      });
     setLoading(false);
   };
 
