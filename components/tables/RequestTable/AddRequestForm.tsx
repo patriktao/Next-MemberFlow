@@ -36,6 +36,8 @@ import InputEmail from "../../ui_components/InputEmail";
 import LoadingButton from "../../ui_components/LoadingButton";
 import displayToast from "../../ui_components/Toast";
 import GDPR from "./GDPR/GDPR";
+import { createUser } from "../../../pages/api/requestAPI/requestAPI";
+import { v4 } from "uuid";
 
 interface Props {
   onCancel: Function;
@@ -88,6 +90,7 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    const uid = v4();
     const requestForm = {
       email: email,
       name: name,
@@ -98,11 +101,12 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       period: period,
       regDate: Timestamp.now(),
       hasPaid: "no",
+      uid: uid,
     };
 
     await createNewRequest(requestForm)
       .then(() => {
-        console.log("Created a new request.");
+        console.log("RequestForm uid: ", requestForm.uid);
         displayToast({
           toast: toast,
           title: "Successfully added a new request.",

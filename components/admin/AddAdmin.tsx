@@ -1,12 +1,11 @@
-import { Heading } from "@chakra-ui/react";
-import { httpsCallable } from "firebase/functions";
+import { addAdmin } from "../../pages/api/adminAPI/adminAPI";
 import React, { useState } from "react";
 import { Table } from "@tanstack/react-table";
-import InputEmail from "../ui_components/InputEmail";
-import LoadingButton from "../ui_components/LoadingButton";
-import { fbFunctions } from "../../pages/api/firebase";
 import { DocumentData } from "firebase/firestore";
 import displayToast from "../ui_components/Toast";
+import { Heading } from "@chakra-ui/react";
+import InputEmail from "../ui_components/InputEmail";
+import LoadingButton from "../ui_components/LoadingButton";
 
 type Props = {
   toast: Function;
@@ -34,10 +33,7 @@ const AddAdmin = (props: Props) => {
   function handleSubmit(event) {
     event.preventDefault();
     setLoading(true);
-    const addAdmin = httpsCallable(fbFunctions, "addAdmin");
-    addAdmin({
-      email: email,
-    })
+    addAdmin(email)
       .then(() => {
         displayToast({
           toast: props.toast,
