@@ -12,6 +12,7 @@
     "@chakra-ui/react": "^2.5.4",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@stripe/stripe-js": "^1.52.1",
     "@tanstack/react-table": "^8.7.9",
     "chakra-dayzed-datepicker": "^0.2.7",
     "date-fns": "^2.29.3",
@@ -30,6 +31,7 @@
     "react-focus-lock": "^2.9.3",
     "react-icons": "^4.7.1",
     "react-table": "^7.8.0",
+    "stripe": "^12.4.0",
     "styled-components": "^5.3.6",
     "uuid": "^9.0.0"
   },
