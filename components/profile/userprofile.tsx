@@ -1,6 +1,6 @@
 import React from "react";
 import withAuth from "../auth/withAuth";
-import { getAuth, updateEmail, sendEmailVerification, onAuthStateChanged } from "firebase/auth";
+import { getAuth, updateEmail, sendEmailVerification, onAuthStateChanged, EmailAuthProvider } from "firebase/auth";
 import { Input, Button, Stack, Heading, Select, IconButton, useDisclosure, FormLabel, TagLabel } from "@chakra-ui/react";
 import { doc, getDoc, updateDoc } from "firebase/firestore"; 
 import { db } from "../../pages/api/firebase";
@@ -23,7 +23,6 @@ const userprofile = () => {
   const [email, setEmail] = useState(null);
   const [ssn, setSSN] = useState(null);
   const [gender, setGender] = useState(null);
-  const [period, setPeriod] = useState(null);
   const [daysLeft, setDaysLeft] = useState(null);
   
 
@@ -42,14 +41,15 @@ const userprofile = () => {
       setEmail(data.email);
       setSSN(data.ssn);
       setGender(data.gender);
-      setPeriod(data.period);
-      const expDate = data.exp_date.toDate();
+      const expDate = data.exp_date?.toDate();
       const oneDay = 24 * 60 * 60 * 1000; // 1 dag i ms
       const daysLeft = Math.round((expDate - Date.now()) / oneDay);
-      setDaysLeft(daysLeft);
-      
+      if(isNaN(expDate)) {
+        setDaysLeft("You don't have an active membership, renew it")
+      } else {
+        setDaysLeft(daysLeft);
+      }
 
-      
     } else {
       throw new Error("User data not found");
     }
@@ -59,23 +59,9 @@ const userprofile = () => {
     fetchUserData();
   }, []);
 
-  // async function updateUserData() {
-  //   const docRef = doc(db, "members", uid);
-  //   await updateDoc(docRef,{
-  //     "name" : name,
-  //     "email" : email,
-  //     "gender" : gender,
-  //   });
-  //   updateEmail(auth.currentUser, email).then(() => {
-  //     sendEmailVerification(auth.currentUser).then(() => {
-        
-  //     });
-  //   }).catch((error) => {
-  //     throw new Error(error);
-  //   });
-  // };
 
   async function updateUserData() {
+    // todo , verification doesnt work correctly
     const user = auth.currentUser;
     const docRef = doc(db, "members", user.uid);
     const userData = {
@@ -85,20 +71,27 @@ const userprofile = () => {
     };
   
     if (user.email !== email) {
-      await updateEmail(user, email).then(()=>{
-        sendEmailVerification(user).then(() => {
-          if(user.emailVerified) {
-            updateDoc(docRef, userData);
-          } else {
-            console.log("NEJ")
-          }
-        });
-      });
-    };
-
-    console.log(onAuthStateChanged);
+      try {
+        await updateEmail(user, email);
+        sendEmailVerification(user);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  
     await updateDoc(docRef, userData);
   };
+
+  async function updateEmail(user, newEmail) {
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      user.currentPassword
+    );
+    await user.reauthenticateWithCredential(credential);
+    await user.updateEmail(newEmail);
+  }
+  
+  
 
 
    
@@ -110,20 +103,19 @@ const userprofile = () => {
     // todo defaultvalue doesnt rerender
   };
 
-  const handleSubmit = (event) => {
-    updateUserData();
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setMode(false);
+    onOpen();
+    await updateUserData();
     console.log(name);
   };
+  
+  
 
   const handleMembership = () => {
 
   }
-
-  
        
-
   return (
     <form onSubmit={handleSubmit}>
     <Stack spacing={4}>
@@ -167,15 +159,28 @@ const userprofile = () => {
       <div style={{ display: "flex", justifyContent: "flex-end"}}>
         {mode ? (
           <>
-            <Button type="submit" color="green">Save</Button>
+            <Button type="submit" colorScheme='blue' mr={3}>Save</Button>
+            <Modal onClose={onClose} isOpen={isOpen} isCentered>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Verification</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  Verify your new email adress
+                </ModalBody>
+                <ModalFooter>
+                  <Button onClick={onClose}>Close</Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
             <Button onClick={handleCancel} color="red">Cancel</Button>             
           </>       
         ) : (
           <IconButton onClick={() => setMode(true)}  icon={<EditIcon />} aria-label="Edit"/>
         )}
-      </div>
-        
-    </Stack>  
+      </div>      
+    </Stack>
+   
     </form>
   )
 };
