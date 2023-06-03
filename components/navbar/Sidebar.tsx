@@ -23,8 +23,7 @@ import displayToast from "../ui_components/Toast";
 const Sidebar: React.FC = () => {
   const { pathname } = useRouter();
   const context = useContext(NavContext);
-  const { navSize, setNavSize, selectedNavItem, setSelectedNavItem } =
-    useContext(NavContext);
+  const { navSize, setNavSize, selectedNavItem, setSelectedNavItem } = context;
   const router = useRouter();
 
   if (!context) {
@@ -78,16 +77,20 @@ const Sidebar: React.FC = () => {
 
   return (
     <Flex
+      title="sidebar"
       left="5"
       boxShadow="0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)"
       borderRadius={navSize == "small" ? "15px" : "30px"}
-      w={navSize == "small" ? "75px" : "280px"}
+      w={navSize == "small" ? "75px" : "230px"}
       flexDir="column"
+      h="100%"
       justifyContent="space-between"
       backgroundColor={component_color}
       background="#FFFFFF"
+      overflowY="auto"
     >
       <Flex
+        title="sidebar-items"
         p="5%"
         flexDir="column"
         w="100%"
@@ -146,7 +149,7 @@ const Sidebar: React.FC = () => {
         alignItems={navSize == "small" ? "center" : "flex-start"}
         mb={4}
       >
-        <Menu>
+        <Menu id="sidebar-menu">
           <MenuButton width="100%" display="grid" justifyContent="center">
             <Divider display={navSize == "small" ? "none" : "flex"} />
             <Flex mt={4} align="center">
@@ -157,7 +160,7 @@ const Sidebar: React.FC = () => {
                 display={navSize == "small" ? "none" : "flex"}
               >
                 <Heading as="h3" size="sm" textAlign={"left"}>
-                  EASA Lund
+                  memberflow.
                   {<ChevronRightIcon marginLeft="4px" />}
                 </Heading>
               </Flex>

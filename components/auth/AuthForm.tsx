@@ -63,6 +63,7 @@ const AuthForm: React.FC<Props> = (props: Props) => {
           }}
           emailError={emailError}
           value={email}
+          id="email"
         />
         <InputPassword
           errorMessage={errorMessage}
@@ -72,6 +73,7 @@ const AuthForm: React.FC<Props> = (props: Props) => {
           }}
           passwordError={passwordError}
           value={password}
+          id="password"
         />
         {errorMessage && (
           <Alert status="error">

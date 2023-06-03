@@ -15,6 +15,10 @@ import {
   MenuList,
   useDisclosure,
   useToast,
+  Box,
+  ButtonGroup,
+  Tfoot,
+  Grid,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -46,6 +50,7 @@ import RequestTableOptions from "./RequestTableOptions";
 import { DummyData } from "./DummyData";
 import { db } from "../../../pages/api/firebase";
 import ExportCSV from "../../csv/ExportCSV";
+import ImportCSV from "../../csv/ImportCSV";
 
 const RequestTable: React.FC = () => {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -189,7 +194,7 @@ const RequestTable: React.FC = () => {
   }, [selectedRows]);
 
   const TableOptionButtons = (
-    <>
+    <ButtonGroup>
       <Button colorScheme="teal" onClick={onOpen}>
         add
       </Button>
@@ -203,26 +208,30 @@ const RequestTable: React.FC = () => {
       >
         delete
       </DeleteRowPopover>
-      <Button onClick={createTestData}>test data</Button>
-      <Menu>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-          actions
-        </MenuButton>
-        <MenuList>
-          <MenuItem>Import CSV</MenuItem>
-          <MenuItem>
-            <ExportCSV
-              data={
-                selectedRows.length == 0
-                  ? tableData
-                  : selectedRows.flatMap((row) => row.original)
-              }
-              fileName="requests"
-            />
-          </MenuItem>
-        </MenuList>
-      </Menu>
-    </>
+      {/* <Button onClick={createTestData}>test data</Button> */}
+      <Box>
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+            actions
+          </MenuButton>
+          <MenuList>
+            <MenuItem>
+              <ImportCSV />
+            </MenuItem>
+            <MenuItem>
+              <ExportCSV
+                data={
+                  selectedRows.length == 0
+                    ? tableData
+                    : selectedRows.flatMap((row) => row.original)
+                }
+                fileName="requests"
+              />
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Box>
+    </ButtonGroup>
   );
 
   function createTestData() {
@@ -232,7 +241,7 @@ const RequestTable: React.FC = () => {
   }
 
   const TableComponent = (
-    <Table size="sm">
+    <Table size="sm" overflow={"auto"}>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -266,10 +275,7 @@ const RequestTable: React.FC = () => {
       <Tbody>
         {table.getRowModel().rows.map((row) => (
           <>
-            <Tr
-              key={row.original.requestId}
-              _hover={{ background: hover_color }}
-            >
+            <Tr key={row.id} _hover={{ background: hover_color }}>
               {row.getVisibleCells().map((cell) => {
                 const meta: any = cell.column.columnDef.meta;
                 return (
@@ -305,7 +311,7 @@ const RequestTable: React.FC = () => {
   );
 
   return (
-    <>
+    <Flex direction="column" title="request-table" overflow="auto">
       <RequestTableOptions
         table={table}
         formatData={formatData}
@@ -313,9 +319,11 @@ const RequestTable: React.FC = () => {
         rowsSelected={rowsSelected}
         buttons={TableOptionButtons}
       />
-      <Flex overflowY="auto">{TableComponent}</Flex>
+      <Box title="table-box" h="100%" overflow="auto">
+        {TableComponent}
+      </Box>
       <RequestTableFooter table={table} selectedRows={selectedRows} />
-    </>
+    </Flex>
   );
 };
 

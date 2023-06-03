@@ -21,6 +21,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
 
   return (
     <Flex
+      title="request-table-footer"
       gap={"1rem"}
       flexDirection="row"
       justifyContent="space-between"

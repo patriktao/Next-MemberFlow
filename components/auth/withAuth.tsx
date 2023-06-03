@@ -3,8 +3,8 @@ import Router from "next/router";
 import { getAuth } from "firebase/auth";
 
 const withAuth = (WrappedComponent: React.ComponentType) => {
+  
   return class extends React.Component {
-    
     static async getInitialProps(ctx) {
       const currentUser = getAuth().currentUser;
       let authenticated = false;
@@ -19,6 +19,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
           ctx.res.end();
         } else {
           Router.push("/");
+          return null;
         }
       }
 

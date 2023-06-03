@@ -69,7 +69,7 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
   try {
     console.log(form);
     const uid = v4();
-    const createForm = {
+    const createForm: RequestForm = {
       requestId: uid,
       regDate: form.regDate,
       name: form.name,

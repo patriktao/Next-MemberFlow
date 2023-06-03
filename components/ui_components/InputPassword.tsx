@@ -14,6 +14,7 @@ interface Props {
   setPassword: Function;
   passwordError: boolean;
   value: string;
+  id?: string;
 }
 
 const InputPassword: React.FC<Props> = (props: Props) => {
@@ -26,6 +27,7 @@ const InputPassword: React.FC<Props> = (props: Props) => {
           children={<LockIcon color="gray.300" />}
         />
         <Input
+          id={props.id || ""}
           type="password"
           value={props.value}
           placeholder="Enter password..."
@@ -33,6 +35,7 @@ const InputPassword: React.FC<Props> = (props: Props) => {
             props.setPassword(e);
           }}
           isRequired
+          autoComplete="current-password"
         />
       </InputGroup>
       {props.passwordError && (

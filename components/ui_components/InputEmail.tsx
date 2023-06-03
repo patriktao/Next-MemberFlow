@@ -14,6 +14,7 @@ interface Props {
   setEmail: Function;
   emailError: boolean;
   value: string;
+  id?: string;
 }
 
 const InputEmail: React.FC<Props> = (props: Props) => {
@@ -26,6 +27,7 @@ const InputEmail: React.FC<Props> = (props: Props) => {
           children={<EmailIcon color="gray.300" />}
         />
         <Input
+          id={props.id || ""}
           name="email"
           type="email"
           placeholder="Enter email..."
@@ -34,6 +36,7 @@ const InputEmail: React.FC<Props> = (props: Props) => {
             props.setEmail(e);
           }}
           isRequired
+          autoComplete="email"
         />
       </InputGroup>
       {props.emailError && (

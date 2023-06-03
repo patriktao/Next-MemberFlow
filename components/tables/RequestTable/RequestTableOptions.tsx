@@ -13,11 +13,11 @@ interface Props {
 
 const RequestTableOptions = (props: Props) => {
   return (
-    <Flex marginBottom={"8px"} justifyContent="space-between" flexFlow="wrap">
+    <Flex id="request-table-options" justifyContent="space-between" flexFlow="wrap" marginBottom="1rem">
       <Heading as="h3" size="md">
         requests ({props.tableData.length ?? 0})
       </Heading>
-      <Flex>
+      <Flex columnGap="0.5rem">
         <ButtonGroup>
           <Button
             variant="outline"
@@ -35,7 +35,7 @@ const RequestTableOptions = (props: Props) => {
             }}
           />
         </ButtonGroup>
-        <ButtonGroup marginLeft="0.5rem">{props.buttons}</ButtonGroup>
+        {props.buttons}
       </Flex>
     </Flex>
   );

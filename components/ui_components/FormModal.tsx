@@ -13,6 +13,7 @@ interface Props {
   onClose: Function;
   children?: ReactNode;
   title: string;
+  id?: string;
   scrollBehavior?: "inside" | "outside";
   size?:
     | "4xl"
@@ -35,14 +36,16 @@ const FormModal: React.FC<Props> = (props: Props) => {
       isOpen={props.isOpen}
       onClose={() => props.onClose()}
       size={props.size}
-      scrollBehavior={props.scrollBehavior || "outside"}
+      scrollBehavior={props.scrollBehavior || "inside"}
       closeOnOverlayClick={false}
+      id={props.id || ""}
+      isCentered
     >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{props.title}</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>{props.children}</ModalBody>
+        <ModalBody overflowY="auto">{props.children}</ModalBody>
       </ModalContent>
     </Modal>
   );

@@ -2,6 +2,7 @@ import { Box, Button, Checkbox } from "@chakra-ui/react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import { HTMLProps, useEffect, useRef } from "react";
+import { RequestTypes } from "../../../types";
 import { getTimestamp } from "../../../utils/date-utils";
 
 export const IndeterminateCheckbox = ({
@@ -54,44 +55,44 @@ const RequestTableColumns = (
         />
       ),
     },
-    columnHelper.accessor("name", {
+    columnHelper.accessor(RequestTypes.name, {
       cell: (info) => info.getValue(),
       header: "Name",
     }),
-    columnHelper.accessor("email", {
+    columnHelper.accessor(RequestTypes.email, {
       header: "Email",
       cell: (info) => info.getValue(),
       meta: {
         isNumeric: true,
       },
     }),
-    columnHelper.accessor("ssn", {
+    columnHelper.accessor(RequestTypes.ssn, {
       cell: (info) => info.getValue(),
       header: "SSN",
       enableResizing: true,
     }),
-    columnHelper.accessor("gender", {
+    columnHelper.accessor(RequestTypes.gender, {
       cell: (info) => info.getValue(),
       header: "Gender",
       enableResizing: true,
     }),
-    columnHelper.accessor("regDate", {
+    columnHelper.accessor(RequestTypes.regDate, {
       cell: (info) => getTimestamp(info.getValue()),
       header: "Reg Date",
     }),
-    columnHelper.accessor("period", {
+    columnHelper.accessor(RequestTypes.period, {
       cell: (info) => info.getValue(),
       header: "Period",
     }),
-    columnHelper.accessor("afMember", {
+    columnHelper.accessor(RequestTypes.afMember, {
       cell: (info) => info.getValue(),
       header: "AF Member?",
     }),
-    columnHelper.accessor("payMethod", {
+    columnHelper.accessor(RequestTypes.payMethod, {
       cell: (info) => info.getValue(),
       header: "Payment Method",
     }),
-    columnHelper.accessor("hasPaid", {
+    columnHelper.accessor(RequestTypes.hasPaid, {
       cell: (info) => info.getValue(),
       header: "Has Paid",
     }),
@@ -99,6 +100,7 @@ const RequestTableColumns = (
       header: "Edit",
       cell: ({ row }) => (
         <Button
+          id={row.id}
           variant="outline"
           size="sm"
           onClick={() => editRow(row)}

@@ -5,12 +5,10 @@ import RequestTable from "../components/tables/RequestTable/RequestTable";
 
 const Dashboard = () => (
   <Layout title="Dashboard">
-    <Heading as="h1" size="lg" paddingBottom="1rem">
+    <Heading title="page-header" as="h1" size="lg" paddingBottom="1rem">
       dashboard.
     </Heading>
-    <Grid>
-      <RequestTable />
-    </Grid>
+    <RequestTable />
   </Layout>
 );
 
