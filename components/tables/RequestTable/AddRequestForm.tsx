@@ -92,13 +92,8 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-<<<<<<< Updated upstream
     const uid = v4();
     const requestForm = {
-=======
-    
-    const requestForm: RequestForm = {
->>>>>>> Stashed changes
       email: email,
       name: name,
       ssn: birthDate + "-" + lastFour,

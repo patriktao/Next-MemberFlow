@@ -12,7 +12,6 @@ function MyApp({ Component, pageProps }) {
           w="100vw"
           h="100vh"
           background={bg_color}
-          padding="1rem"
         >
           <Component {...pageProps} />
         </Box>

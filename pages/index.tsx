@@ -1,18 +1,28 @@
-import { Box, Center, Heading } from "@chakra-ui/react";
+import { Box, Grid, Heading } from "@chakra-ui/react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import AuthForm from "../components/auth/AuthForm";
 import PasswordRecoveryForm from "../components/passwordRecovery/PasswordRecoveryForm";
 
 const Login = () => {
   return (
-    <Center minH="100vh">
+    <Grid
+      minH="100vh"
+      w="100vw"
+      mx="auto"
+      alignContent="center"
+      bgImage="/LoginImage.jpg"
+      bgRepeat="no-repeat"
+      bgSize="cover"
+    >
       <Box
-        minW="container.sm"
+        w="container.sm"
         mx="auto"
+        minH="420px"
+        alignContent="center"
         p="4"
         background="white"
         padding="2rem"
-        borderRadius={"2xl"}
+        rounded="3xl"
       >
         <Heading as="h1" size="xl" mb="6">
           memberflow.
@@ -32,7 +42,7 @@ const Login = () => {
           </TabPanels>
         </Tabs>
       </Box>
-    </Center>
+    </Grid>
   );
 };
 
