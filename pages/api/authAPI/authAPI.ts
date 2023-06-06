@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, User } from "firebase/auth";
 import { callWithTimeout } from "../../../utils";
 import { userAuth } from "../firebase";
 
@@ -10,4 +10,9 @@ export const logIn = async (email: string, password: string) => {
 export const logOut = async () => {
   let signOutAttempt = signOut(userAuth);
   await callWithTimeout(signOutAttempt, 1000, "Sign-out timed out");
+};
+
+export const getCurrentUser = (): User | null => {
+  const user = userAuth.currentUser;
+  return user;
 };

@@ -1,39 +1,30 @@
-import React from "react";
-import Router from "next/router";
-import { getAuth } from "firebase/auth";
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import { getCurrentUser } from "../../pages/api/authAPI/authAPI";
 
-const withAuth = (WrappedComponent: React.ComponentType) => {
-  
-  return class extends React.Component {
-    static async getInitialProps(ctx) {
-      const currentUser = getAuth().currentUser;
-      let authenticated = false;
+const withAuth = <P extends Record<string, unknown>>(
+  WrappedComponent: React.ComponentType<P>
+) => {
+  const Wrapper = (props: P) => {
+    const router = useRouter();
 
-      if (currentUser) {
-        authenticated = true;
-      }
-
-      if (!authenticated) {
-        if (typeof window === "undefined") {
-          ctx.res.writeHead(302, { Location: "/" });
-          ctx.res.end();
-        } else {
-          Router.push("/");
-          return null;
+    useEffect(() => {
+      const checkAuth = async () => {
+        const user = localStorage.getItem("authToken");
+        if (!user) {
+          // User is not authenticated, redirect to sign-in page
+          localStorage.removeItem("authToken");
+          router.push("/");
         }
-      }
+      };
 
-      const pageProps = WrappedComponent.getInitialProps
-        ? await WrappedComponent.getInitialProps(ctx)
-        : {};
+      checkAuth();
+    }, []);
 
-      return { ...pageProps };
-    }
-
-    render() {
-      return <WrappedComponent {...this.props} />;
-    }
+    return <WrappedComponent {...props} />;
   };
+
+  return Wrapper;
 };
 
 export default withAuth;

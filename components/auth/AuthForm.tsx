@@ -9,11 +9,18 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-import { logIn } from "../../pages/api/authAPI/authAPI";
+import { getCurrentUser, logIn } from "../../pages/api/authAPI/authAPI";
 import displayToast from "../ui_components/Toast";
 import InputEmail from "../ui_components/InputEmail";
 import InputPassword from "../ui_components/InputPassword";
 import LoadingButton from "../ui_components/LoadingButton";
+import {
+  getAuth,
+  setPersistence,
+  browserSessionPersistence,
+  signInWithEmailAndPassword,
+  browserLocalPersistence,
+} from "firebase/auth";
 
 type Props = {};
 
@@ -32,23 +39,38 @@ const AuthForm: React.FC<Props> = (props: Props) => {
   const router = useRouter();
   const toast = useToast();
 
+  const auth = getAuth();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     setLoading(true);
-    logIn(email, password)
+    //SetPersistance is used to persist a user's session
+    setPersistence(auth, browserLocalPersistence)
       .then(() => {
-        displayToast({
-          toast: toast,
-          title: "Successfully logged in.",
-          status: "success",
-        });
-        router.push("/dashboard");
-        setLoading(false);
+        return logIn(email, password)
+          .then(async () => {
+            displayToast({
+              toast: toast,
+              title: "Successfully logged in.",
+              status: "success",
+            });
+            localStorage.setItem(
+              "authToken",
+              await getCurrentUser().getIdToken()
+            );
+            router.push("/dashboard");
+            console.log(getCurrentUser());
+            setLoading(false);
+          })
+          .catch((error) => {
+            setErrorMessage(error.message);
+            console.error("Error signing in:", error);
+            setLoading(false);
+          });
       })
       .catch((error) => {
-        setErrorMessage(error.message);
-        console.error("Error signing in:", error);
-        setLoading(false);
+        console.log(error.code);
+        console.log(error.message);
       });
   };
 

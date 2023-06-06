@@ -15,7 +15,7 @@ const displayToast: Function = (props: ToastProps) => {
     status: props.status,
     duration: props.duration | 4000,
     isClosable: true,
-    position: props.position ?? "bottom",
+    position: props.position ?? "top",
   });
 };
 

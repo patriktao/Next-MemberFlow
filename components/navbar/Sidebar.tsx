@@ -10,6 +10,8 @@ import {
   MenuItem,
   MenuList,
   useToast,
+  Box,
+  Text,
 } from "@chakra-ui/react";
 import { FiMenu, FiHome, FiCalendar, FiUser, FiKey } from "react-icons/fi";
 import NavItem from "./NavItem";
@@ -17,7 +19,7 @@ import { component_color } from "../../styles/colors";
 import { useRouter } from "next/router";
 import { NavContext } from "../../pages/contexts/NavContext";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { logOut } from "../../pages/api/authAPI/authAPI";
+import { getCurrentUser, logOut } from "../../pages/api/authAPI/authAPI";
 import displayToast from "../ui_components/Toast";
 
 const Sidebar: React.FC = () => {
@@ -32,7 +34,7 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     navItemSelector();
-  });
+  }, []);
 
   function navItemSelector() {
     switch (pathname) {
@@ -65,6 +67,7 @@ const Sidebar: React.FC = () => {
           title: "Successfully logged out.",
           status: "success",
         });
+        localStorage.removeItem("authToken");
         router.push("/");
       })
       .catch((error) =>
@@ -77,37 +80,32 @@ const Sidebar: React.FC = () => {
 
   return (
     <Flex
-      title="sidebar"
-      left="5"
       boxShadow="0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)"
-      borderRadius={navSize == "small" ? "15px" : "30px"}
-      w={navSize == "small" ? "75px" : "230px"}
+      borderRadius={{ base: "15px", md: "30px" }}
+      w={{ base: "75px", md: "240px" }}
       flexDir="column"
       h="100%"
       justifyContent="space-between"
       backgroundColor={component_color}
       background="#FFFFFF"
-      overflowY="auto"
     >
       <Flex
-        title="sidebar-items"
         p="5%"
         flexDir="column"
         w="100%"
-        alignItems={navSize == "small" ? "center" : "flex-start"}
+        alignItems={{ base: "center", md: "flex-start" }}
         as="nav"
       >
-        <IconButton
-          background="none"
-          mt={5}
-          _hover={{ background: "none" }}
-          icon={<FiMenu />}
-          onClick={() => {
-            if (navSize == "small") setNavSize("large");
-            else setNavSize("small");
-          }}
-          aria-label={""}
-        />
+        <Text
+          fontSize="xl"
+          fontWeight={"bold"}
+          textAlign="center"
+          my="4"
+          w="full"
+        >
+          memberflow.
+        </Text>
+        <Divider display={{ base: "none", md: "block" }} mx="auto" w="120px" />
         <NavItem
           navSize={navSize}
           icon={FiHome}
@@ -157,10 +155,10 @@ const Sidebar: React.FC = () => {
               <Flex
                 flexDir="column"
                 ml={4}
-                display={navSize == "small" ? "none" : "flex"}
+                display={{ base: "none", md: "block" }}
               >
-                <Heading as="h3" size="sm" textAlign={"left"}>
-                  memberflow.
+                <Heading as="h3" size="sm" textAlign={"center"}>
+                  User
                   {<ChevronRightIcon marginLeft="4px" />}
                 </Heading>
               </Flex>
