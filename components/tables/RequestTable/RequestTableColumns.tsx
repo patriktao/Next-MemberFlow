@@ -107,7 +107,7 @@ const RequestTableColumns = (
           onClick={() => editRow(row)}
           colorScheme="teal"
         >
-          <EditIcon fontSize={"20px"} />
+          <EditIcon fontSize={"15px"} />
         </Button>
       ),
     },

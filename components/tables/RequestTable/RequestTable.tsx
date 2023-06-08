@@ -110,6 +110,7 @@ const RequestTable: React.FC = () => {
           }
         });
         prevData.current = requests;
+        requests.sort((a, b) => a.name.localeCompare(b.name));
         setFetchedData(requests);
         setTableData(requests);
       });
@@ -205,7 +206,6 @@ const RequestTable: React.FC = () => {
       >
         delete
       </DeleteRowPopover>
-      {/* <Button onClick={createTestData}>test data</Button> */}
       <Menu>
         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
           actions
@@ -306,7 +306,7 @@ const RequestTable: React.FC = () => {
   );
 
   return (
-    <Flex direction="column" title="request-table" overflow="auto">
+    <Flex direction="column" overflow="auto">
       <RequestTableOptions
         table={table}
         formatData={formatData}
