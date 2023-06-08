@@ -1,3 +1,4 @@
+import { EditIcon } from "@chakra-ui/icons";
 import { Box, Button, Checkbox } from "@chakra-ui/react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
@@ -104,8 +105,9 @@ const RequestTableColumns = (
           variant="outline"
           size="sm"
           onClick={() => editRow(row)}
+          colorScheme="teal"
         >
-          Edit
+          <EditIcon fontSize={"20px"} />
         </Button>
       ),
     },

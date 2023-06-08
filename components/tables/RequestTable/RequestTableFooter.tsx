@@ -21,22 +21,24 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
 
   return (
     <Flex
-      title="request-table-footer"
-      gap={"1rem"}
+      padding="12px"
       flexDirection="row"
       justifyContent="space-between"
       alignItems={"center"}
       className="css-r10se1"
     >
-      <Flex gap={"1rem"}>
-        <IndeterminateCheckbox
-          {...{
-            checked: table.getIsAllPageRowsSelected(),
-            indeterminate: table.getIsSomePageRowsSelected(),
-            onChange: table.getToggleAllPageRowsSelectedHandler(),
-          }}
-        />
-        <Box>Selected: {selectedRows.length}</Box>
+      <Flex gap={"8px"} flexDir="column">
+        <Flex gap="8px">
+          Select Current Page
+          <IndeterminateCheckbox
+            {...{
+              checked: table.getIsAllPageRowsSelected(),
+              indeterminate: table.getIsSomePageRowsSelected(),
+              onChange: table.getToggleAllPageRowsSelectedHandler(),
+            }}
+          />
+        </Flex>
+        Selected: {selectedRows.length}
       </Flex>
       <Button
         colorScheme="teal"

@@ -30,10 +30,7 @@ import { useState } from "react";
 import { RequestForm } from "../../../interfaces";
 import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
 import { RequestTypes } from "../../../types";
-import {
-  membershipPeriods,
-  paymentMethods,
-} from "../../../utils/payment-methods";
+import { membershipPeriods, paymentMethods } from "../../../types";
 import InputEmail from "../../ui_components/InputEmail";
 import LoadingButton from "../../ui_components/LoadingButton";
 import displayToast from "../../ui_components/Toast";

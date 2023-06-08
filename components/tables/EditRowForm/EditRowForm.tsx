@@ -3,10 +3,7 @@ import { DocumentData, Timestamp } from "firebase/firestore";
 import { isEqual } from "lodash";
 import { ChangeEvent, useCallback, useReducer, useState } from "react";
 import { getTimestamp } from "../../../utils/date-utils";
-import {
-  membershipPeriods,
-  paymentMethods,
-} from "../../../utils/payment-methods";
+import { membershipPeriods, paymentMethods } from "../../../types";
 import Datepicker from "../../ui_components/Datepicker";
 import Input from "../../ui_components/Input";
 import InputEmail from "../../ui_components/InputEmail";

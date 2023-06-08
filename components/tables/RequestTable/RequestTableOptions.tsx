@@ -13,7 +13,12 @@ interface Props {
 
 const RequestTableOptions = (props: Props) => {
   return (
-    <Flex id="request-table-options" justifyContent="space-between" flexFlow="wrap" marginBottom="1rem">
+    <Flex
+      id="request-table-options"
+      justifyContent="space-between"
+      flexFlow="wrap"
+      marginBottom="1rem"
+    >
       <Heading as="h3" size="md">
         requests ({props.tableData.length ?? 0})
       </Heading>
@@ -28,8 +33,9 @@ const RequestTableOptions = (props: Props) => {
             deselect
           </Button>
           <Input
-            placeholder="search here..."
-            maxW="300px"
+            placeholder="search name, email, ssn etc..."
+            w={{ base: "300px", lg: "400px" }}
+            maxW={{ base: "300px", lg: "400px" }}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               props.formatData(e.target.value.toLowerCase());
             }}

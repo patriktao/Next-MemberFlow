@@ -22,3 +22,11 @@ export function callWithTimeout<T>(
   });
 }
 
+export const mapToOptions: (list: string[]) => { label: string; value: string }[] = (
+  list
+) => {
+  return list.map((item) => ({
+    label: item,
+    value: item,
+  }));
+};

@@ -17,8 +17,6 @@ import {
   useToast,
   Box,
   ButtonGroup,
-  Tfoot,
-  Grid,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -50,7 +48,7 @@ import RequestTableOptions from "./RequestTableOptions";
 import { DummyData } from "./DummyData";
 import { db } from "../../../pages/api/firebase";
 import ExportCSV from "../../csv/ExportCSV";
-import ImportCSV from "../../csv/ImportCSV";
+import CSVImport from "../../csv/CSVImport";
 
 const RequestTable: React.FC = () => {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -62,9 +60,10 @@ const RequestTable: React.FC = () => {
   const [editingRow, setEditingRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
+  
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 12,
+    pageSize: 15,
   });
 
   const pagination = React.useMemo(
@@ -209,28 +208,26 @@ const RequestTable: React.FC = () => {
         delete
       </DeleteRowPopover>
       {/* <Button onClick={createTestData}>test data</Button> */}
-      <Box>
-        <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            actions
-          </MenuButton>
-          <MenuList>
-            <MenuItem>
-              <ImportCSV />
-            </MenuItem>
-            <MenuItem>
-              <ExportCSV
-                data={
-                  selectedRows.length == 0
-                    ? tableData
-                    : selectedRows.flatMap((row) => row.original)
-                }
-                fileName="requests"
-              />
-            </MenuItem>
-          </MenuList>
-        </Menu>
-      </Box>
+      <Menu>
+        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+          actions
+        </MenuButton>
+        <MenuList>
+          <MenuItem>
+            <CSVImport />
+          </MenuItem>
+          <MenuItem>
+            <ExportCSV
+              data={
+                selectedRows.length == 0
+                  ? tableData
+                  : selectedRows.flatMap((row) => row.original)
+              }
+              fileName="requests"
+            />
+          </MenuItem>
+        </MenuList>
+      </Menu>
     </ButtonGroup>
   );
 
@@ -241,7 +238,7 @@ const RequestTable: React.FC = () => {
   }
 
   const TableComponent = (
-    <Table size="sm" overflow={"auto"}>
+    <Table size={{ base: "sm" }} overflow={"auto"}>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -319,7 +316,7 @@ const RequestTable: React.FC = () => {
         rowsSelected={rowsSelected}
         buttons={TableOptionButtons}
       />
-      <Box title="table-box" h="100%" overflow="auto">
+      <Box h="100%" overflow="auto">
         {TableComponent}
       </Box>
       <RequestTableFooter table={table} selectedRows={selectedRows} />

@@ -13,6 +13,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@tanstack/react-table": "^8.7.9",
+    "@yaarn/react-spreadsheet-import": "^5.0.0",
     "chakra-dayzed-datepicker": "^0.2.7",
     "date-fns": "^2.29.3",
     "dayzed": "^3.2.3",
@@ -30,6 +31,7 @@
     "react-dom": "^18.2.0",
     "react-focus-lock": "^2.9.3",
     "react-icons": "^4.7.1",
+    "react-spreadsheet-import": "^4.0.2",
     "react-table": "^7.8.0",
     "styled-components": "^5.3.6",
     "uuid": "^9.0.0"
