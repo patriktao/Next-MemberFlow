@@ -57,7 +57,7 @@ const RequestTable: React.FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
   const [isDeleting, setDeleting] = useState(false);
-  const [editingRow, setEditingRow] = useState(null);
+  const [editingRow, setEditingRow] = useState<Row<DocumentData>>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
 
@@ -127,8 +127,8 @@ const RequestTable: React.FC = () => {
 
   /* EDIT */
   const editRow = useCallback(
-    (row): void => {
-      setEditingRow(row.original);
+    (row: Row<DocumentData>): void => {
+      setEditingRow(row);
     },
     [editingRow]
   );
@@ -203,6 +203,7 @@ const RequestTable: React.FC = () => {
         isDeleting={isDeleting}
         isOpen={isPopoverOpen}
         setOpen={setPopoverOpen}
+        header="Delete selected requests"
       >
         delete
       </DeleteRowPopover>
@@ -289,16 +290,17 @@ const RequestTable: React.FC = () => {
                 );
               })}
             </Tr>
-            {editingRow && editingRow.requestId === row.original.requestId && (
-              <FormModal
-                isOpen={Boolean(editingRow)}
-                onClose={closeEdit}
-                title={"Edit Request"}
-                size="3xl"
-              >
-                <EditRowForm row={editingRow} onClose={closeEdit} />
-              </FormModal>
-            )}
+            {editingRow &&
+              editingRow.original.requestId === row.original.requestId && (
+                <FormModal
+                  isOpen={Boolean(editingRow)}
+                  onClose={closeEdit}
+                  title={"Edit Request"}
+                  size="3xl"
+                >
+                  <EditRowForm row={editingRow} onClose={closeEdit} />
+                </FormModal>
+              )}
           </>
         ))}
       </Tbody>

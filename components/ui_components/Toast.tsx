@@ -13,7 +13,7 @@ const displayToast: Function = (props: ToastProps) => {
     title: props.title,
     description: props.description,
     status: props.status,
-    duration: props.duration | 4000,
+    duration: props.duration | 8000,
     isClosable: true,
     position: props.position ?? "top",
   });

@@ -9,18 +9,21 @@ import {
   PopoverFooter,
   Button,
   Box,
+  useToast,
 } from "@chakra-ui/react";
-import React, { ReactNode } from "react";
+import React, { useCallback, useState } from "react";
+import { ReactNode } from "react";
 import Spinner from "../ui_components/Spinner";
 
 type Props = {
   children?: ReactNode;
   handleDelete: Function;
-  isDisabled: boolean;
-  isDeleting: boolean;
+  isDisabled?: boolean;
+  isDeleting?: boolean;
   variant?: string;
   isOpen: boolean;
   setOpen: Function;
+  header?: string;
 };
 
 const DeleteRowPopover: React.FC<Props> = (props: Props) => {
@@ -30,10 +33,10 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
         <PopoverTrigger>
           <Button
             onClick={() => props.setOpen(!props.isOpen)}
-            isDisabled={props.isDisabled}
+            isDisabled={props.isDisabled || false}
             variant={props.variant ?? "outline"}
             colorScheme={props.isDeleting || !props.isDisabled ? "red" : "gray"}
-            isLoading={props.isDeleting}
+            isLoading={props.isDeleting || false}
             spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
           >
             {props.children}
@@ -43,12 +46,10 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
           <PopoverArrow />
           <PopoverCloseButton onClick={() => props.setOpen(!props.isOpen)} />
           <PopoverHeader pt={4} fontWeight="bold" border="0">
-            Delete selected requests
+            {props.header}
           </PopoverHeader>
           <PopoverArrow />
-          <PopoverBody>
-            Are you sure you want to delete the following selected requests?
-          </PopoverBody>
+          <PopoverBody>Are you sure you want to delete?</PopoverBody>
           <PopoverFooter border="0" textAlign={"right"} pb={4}>
             <Button
               color="red"

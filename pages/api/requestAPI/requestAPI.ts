@@ -21,50 +21,6 @@ export async function createUser(uid: string, email: string, password: string) {
   return createUser({ email: email, uid: uid, password: password });
 }
 
-/* NOT USED RN */
-export function fetchRequests(
-  prevData: React.MutableRefObject<DocumentData[]>
-): Promise<DocumentData[]> {
-  return new Promise((resolve, reject) => {
-    try {
-      onSnapshot(collection(db, "requests"), (snapshot) => {
-        let requests = prevData.current.map((x) => x);
-        snapshot.docChanges().forEach((change) => {
-          const personData = change.doc.data();
-          const personId = personData.requestId;
-          switch (change.type) {
-            case "added":
-              if (
-                !requests.find(
-                  (member: DocumentData) => member.requestId === personId
-                )
-              ) {
-                requests.push(personData);
-              }
-              break;
-            case "removed":
-              requests = requests.filter(
-                (member: DocumentData) => member.requestId !== personId
-              );
-              break;
-            case "modified":
-              requests = requests.filter(
-                (member: DocumentData) => member.requestId !== personId
-              );
-              requests.push(personData);
-              break;
-            default:
-              break;
-          }
-        });
-        resolve(requests);
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-
 export async function createNewRequest(form: RequestForm): Promise<void> {
   try {
     console.log(form);

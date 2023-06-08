@@ -42,7 +42,6 @@ function deleteRequestHandler({
         toast: toast,
         title: "Successfully removed requests.",
         status: "success",
-        position: "top-right",
       });
       resetRowSelection();
       setDeleting(false);
@@ -53,7 +52,6 @@ function deleteRequestHandler({
         toast: toast,
         title: "Error removing requests.",
         status: "error",
-        position: "top-right",
       });
       setDeleting(false);
     }

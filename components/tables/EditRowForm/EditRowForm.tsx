@@ -12,29 +12,35 @@ import { reducer } from "./EditRowReducer";
 import LoadingButton from "../../ui_components/LoadingButton";
 import { updateRequest } from "../../../pages/api/requestAPI/requestAPI";
 import displayToast from "../../ui_components/Toast";
+import DeleteRowPopover from "../DeleteRowPopover";
+import deleteRequestHandler from "../RequestTable/DeleteRequestHandler";
+import { Row } from "@tanstack/react-table";
 
 interface Props {
-  row: DocumentData;
+  row: Row<DocumentData>;
   onClose: Function;
 }
 
 const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
+  const data = row.original;
   const [state, dispatch] = useReducer(reducer, {
-    email: row.email,
-    regDate: row.regDate,
-    name: row.name,
-    ssn: row.ssn,
-    gender: row.gender,
-    afMember: row.afMember,
-    payMethod: row.payMethod,
-    period: row.period,
-    hasPaid: row.hasPaid,
-    requestId: row.requestId,
+    email: data.email,
+    regDate: data.regDate,
+    name: data.name,
+    ssn: data.ssn,
+    gender: data.gender,
+    afMember: data.afMember,
+    payMethod: data.payMethod,
+    period: data.period,
+    hasPaid: data.hasPaid,
+    requestId: data.requestId,
   });
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setLoading] = useState<boolean>(false);
-  const emailError = row.email === "" || false;
+  const emailError = data.email === "" || false;
   const isChanged = !isEqual(state, row);
+
+  const [showDelete, setShowDelete] = useState(false);
 
   const handleChange: Function = useCallback(
     (e): void => {
@@ -47,6 +53,17 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
     },
     [state]
   );
+
+  const [isDeleting, setDeleting] = useState<boolean>(false);
+
+  const handleDelete = () => {
+    deleteRequestHandler({
+      selectedRows: [row],
+      setDeleting: setDeleting,
+      toast: toast,
+      resetRowSelection: () => {},
+    });
+  };
 
   const toast = useToast();
 
@@ -64,7 +81,7 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
               status: "success",
               position: "right-top",
             });
-            row = state;
+            row.original = state;
             onClose();
           })
           .catch((error) => {
@@ -197,17 +214,28 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             </option>
           </Select>
         </Grid>
-        <ButtonGroup display="flex" justifyContent="flex-end">
-          <Button variant="outline" onClick={() => onClose()}>
-            Cancel
-          </Button>
-          <LoadingButton
-            color="teal"
-            isDisabled={!isChanged}
-            isLoading={isLoading}
+        <ButtonGroup display="flex" justifyContent="space-between">
+          <DeleteRowPopover
+            header="Delete request"
+            isDeleting={isDeleting}
+            handleDelete={handleDelete}
+            isOpen={showDelete}
+            setOpen={() => setShowDelete(!showDelete)}
           >
-            Save
-          </LoadingButton>
+            Delete
+          </DeleteRowPopover>
+          <ButtonGroup>
+            <Button variant="outline" onClick={() => onClose()}>
+              Cancel
+            </Button>
+            <LoadingButton
+              color="teal"
+              isDisabled={!isChanged}
+              isLoading={isLoading}
+            >
+              Save
+            </LoadingButton>
+          </ButtonGroup>
         </ButtonGroup>
       </Flex>
     </form>
