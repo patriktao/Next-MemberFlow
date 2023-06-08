@@ -1,6 +1,6 @@
 import AdminTable from "../components/tables/AdminTable/AdminTable";
 import withAuth from "../components/auth/withAuth";
-import Layout from "../components/Layout";
+import Layout from "../components/ui_components/Layout";
 import { Heading, VStack } from "@chakra-ui/react";
 
 const Admins = () => {

@@ -1,7 +1,7 @@
 import { Grid, Heading } from "@chakra-ui/react";
 import React from "react";
 import withAuth from "../components/auth/withAuth";
-import Layout from "../components/Layout";
+import Layout from "../components/ui_components/Layout";
 import { MemberTable } from "../components/tables/MemberTable/MemberTable";
 
 type Props = {};
