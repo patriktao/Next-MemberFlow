@@ -60,11 +60,13 @@ const RequestTable: React.FC = () => {
   const [editingRow, setEditingRow] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
-  
+
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 15,
   });
+
+  const toast = useToast();
 
   const pagination = React.useMemo(
     () => ({
@@ -158,7 +160,6 @@ const RequestTable: React.FC = () => {
 
   const rowsSelected: boolean = selectedRows.length > 0;
 
-  /* Checks if Row is Selected */
   function isRowSelected(selected: Row<DocumentData>): Boolean {
     return Boolean(
       selectedRows.find(
@@ -167,7 +168,6 @@ const RequestTable: React.FC = () => {
     );
   }
 
-  /* FORMAT */
   function formatData(searchTerm: string): void {
     let filteredData = fetchedData;
     if (searchTerm.length !== 0) {
@@ -180,8 +180,6 @@ const RequestTable: React.FC = () => {
     }
     setTableData(filteredData);
   }
-
-  const toast = useToast();
 
   const handleDelete = useCallback(() => {
     deleteRequestHandler({

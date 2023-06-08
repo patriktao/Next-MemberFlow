@@ -6,9 +6,10 @@ import {
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Row, Table } from "@tanstack/react-table";
+import { PaginationState, Row, Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import Alert from "../../ui_components/Alert";
+import Select from "../../ui_components/Select";
 import { IndeterminateCheckbox } from "./RequestTableColumns";
 
 interface Props {
@@ -40,20 +41,21 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
         </Flex>
         Selected: {selectedRows.length}
       </Flex>
-      <Button
-        colorScheme="teal"
-        isDisabled={selectedRows.length === 0}
-        onClick={onOpen}
-      >
-        Accept Requests
-      </Button>
-      <Alert
-        isOpen={isOpen}
-        onClose={onClose}
-        header={"Accept Requests"}
-        body={"Are you sure? You can't undo this action afterwards."}
-      />
-      <Flex gridAutoFlow={"column"} columnGap="1rem">
+      <Flex gridAutoFlow={"column"} columnGap="1rem" alignItems="center">
+        <Flex flexDir={"row"} alignItems="center">
+          Page Count
+          <Select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => {
+              table.setPageSize(Number(e.target.value));
+            }}
+          >
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+            <option value={25}>25</option>
+          </Select>
+        </Flex>
         <Box flexDirection="row">
           Page
           <Text fontWeight={700}>
@@ -65,32 +67,45 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
           <Button
             size="sm"
             onClick={() => table.setPageIndex(0)}
-            disabled={table.getCanPreviousPage()}
+            isDisabled={!table.getCanPreviousPage()}
           >
             {"<<"}
           </Button>
           <Button
             size="sm"
             onClick={() => table.previousPage()}
-            disabled={table.getCanPreviousPage()}
+            isDisabled={!table.getCanPreviousPage()}
           >
             {"<"}
           </Button>
           <Button
             size="sm"
             onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            isDisabled={!table.getCanNextPage()}
           >
             {">"}
           </Button>
           <Button
             size="sm"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            isDisabled={!table.getCanNextPage()}
           >
             {">>"}
           </Button>
         </ButtonGroup>
+        <Button
+          colorScheme="teal"
+          isDisabled={selectedRows.length === 0}
+          onClick={onOpen}
+        >
+          Accept Requests
+        </Button>
+        <Alert
+          isOpen={isOpen}
+          onClose={onClose}
+          header={"Accept Requests"}
+          body={"Are you sure? You can't undo this action afterwards."}
+        />
       </Flex>
     </Flex>
   );
