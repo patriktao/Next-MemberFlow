@@ -34,7 +34,7 @@ import { db, fbFunctions } from "../../../pages/api/firebase";
 import { hover_color } from "../../../styles/colors";
 import AddAdminModal from "../../admin/AddAdminModal";
 import displayToast from "../../ui_components/Toast";
-import DeleteRowPopover from "../DeleteRowPopover";
+import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
 import AdminTableColumns from "./AdminTableColumns";
 
 const AdminTable = () => {

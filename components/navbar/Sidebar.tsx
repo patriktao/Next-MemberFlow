@@ -110,7 +110,7 @@ const Sidebar: React.FC = () => {
         <NavItem
           navSize={navSize}
           icon={FiHome}
-          title="Dashboard"
+          title="dashbord"
           description="This is the description for the dashboard."
           active={selectedNavItem === "/dashboard"}
           path="/dashboard"
@@ -118,7 +118,7 @@ const Sidebar: React.FC = () => {
         <NavItem
           navSize={navSize}
           icon={FiUser}
-          title="Members"
+          title="members"
           active={selectedNavItem === "/members"}
           description={undefined}
           path="/members"
@@ -126,7 +126,7 @@ const Sidebar: React.FC = () => {
         <NavItem
           navSize={navSize}
           icon={FiCalendar}
-          title="Archived"
+          title="archived"
           description={undefined}
           active={selectedNavItem === "/archived"}
           path="/archived"
@@ -134,7 +134,7 @@ const Sidebar: React.FC = () => {
         <NavItem
           navSize={navSize}
           icon={FiKey}
-          title="Admins"
+          title="admins"
           description={undefined}
           active={selectedNavItem === "/admins"}
           path="/admins"

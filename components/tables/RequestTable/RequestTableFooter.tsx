@@ -98,7 +98,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
           isDisabled={selectedRows.length === 0}
           onClick={onOpen}
         >
-          Accept Requests
+          accept requests
         </Button>
         <Alert
           isOpen={isOpen}

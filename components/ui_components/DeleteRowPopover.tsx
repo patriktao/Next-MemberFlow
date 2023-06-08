@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { ReactNode } from "react";
-import Spinner from "../ui_components/Spinner";
+import Spinner from "./Spinner";
 
 type Props = {
   children?: ReactNode;

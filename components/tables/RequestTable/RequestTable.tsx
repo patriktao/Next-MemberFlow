@@ -37,15 +37,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, DocumentData, onSnapshot } from "firebase/firestore";
 import AddRequestModal from "./AddRequestModal";
 import { hover_color } from "../../../styles/colors";
-import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
-import DeleteRowPopover from "../DeleteRowPopover";
+import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
 import RequestTableColumns from "./RequestTableColumns";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import FormModal from "../../ui_components/FormModal";
 import RequestTableFooter from "./RequestTableFooter";
 import deleteRequestHandler from "./DeleteRequestHandler";
 import RequestTableOptions from "./RequestTableOptions";
-import { DummyData } from "./DummyData";
 import { db } from "../../../pages/api/firebase";
 import ExportCSV from "../../csv/ExportCSV";
 import CSVImport from "../../csv/CSVImport";
@@ -229,12 +227,6 @@ const RequestTable: React.FC = () => {
       </Menu>
     </ButtonGroup>
   );
-
-  function createTestData() {
-    DummyData.forEach(async (form) => {
-      await createNewRequest(form);
-    });
-  }
 
   const TableComponent = (
     <Table size={{ base: "sm" }} overflow={"auto"}>

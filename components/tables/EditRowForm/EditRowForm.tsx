@@ -12,7 +12,7 @@ import { reducer } from "./EditRowReducer";
 import LoadingButton from "../../ui_components/LoadingButton";
 import { updateRequest } from "../../../pages/api/requestAPI/requestAPI";
 import displayToast from "../../ui_components/Toast";
-import DeleteRowPopover from "../DeleteRowPopover";
+import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
 import deleteRequestHandler from "../RequestTable/DeleteRequestHandler";
 import { Row } from "@tanstack/react-table";
 
@@ -222,18 +222,18 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
             isOpen={showDelete}
             setOpen={() => setShowDelete(!showDelete)}
           >
-            Delete
+            delete
           </DeleteRowPopover>
           <ButtonGroup>
             <Button variant="outline" onClick={() => onClose()}>
-              Cancel
+              cancel
             </Button>
             <LoadingButton
               color="teal"
               isDisabled={!isChanged}
               isLoading={isLoading}
             >
-              Save
+              save
             </LoadingButton>
           </ButtonGroup>
         </ButtonGroup>
