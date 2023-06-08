@@ -81,13 +81,14 @@ const Sidebar: React.FC = () => {
   return (
     <Flex
       boxShadow="0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)"
-      borderRadius={{ base: "15px", md: "30px" }}
-      w={{ base: "75px", md: "240px" }}
+      borderRadius={"30px"}
+      w={"240px"}
       flexDir="column"
       h="100%"
       justifyContent="space-between"
       backgroundColor={component_color}
       background="#FFFFFF"
+      display={{ base: "none", md: "flex" }}
     >
       <Flex
         p="5%"
