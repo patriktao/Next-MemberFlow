@@ -1,8 +1,6 @@
 import React, { createContext, useState } from "react";
 
 interface NavContextProps {
-  navSize: string;
-  setNavSize: (value: string) => void;
   selectedNavItem: string;
   setSelectedNavItem: (value: string) => void;
 }
@@ -12,12 +10,11 @@ interface NavProviderProps {
 }
 
 export const NavProvider: React.FC<NavProviderProps> = ({ children }) => {
-  const [navSize, setNavSize] = useState("large");
   const [selectedNavItem, setSelectedNavItem] = useState("/dashboard");
 
   return (
     <NavContext.Provider
-      value={{ navSize, setNavSize, selectedNavItem, setSelectedNavItem }}
+      value={{ selectedNavItem, setSelectedNavItem }}
     >
       {children}
     </NavContext.Provider>

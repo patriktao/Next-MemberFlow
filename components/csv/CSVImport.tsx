@@ -261,7 +261,7 @@ const CSVImport = () => {
 
   return (
     <Box onClick={onOpen} w="full">
-      <Text>Import CSV</Text>
+      <Text>Import</Text>
       <FormModal
         isOpen={isOpen}
         onClose={onClose}

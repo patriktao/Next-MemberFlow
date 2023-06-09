@@ -17,6 +17,7 @@ import {
   useToast,
   Box,
   ButtonGroup,
+  Icon,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -43,7 +44,7 @@ import EditRowForm from "../EditRowForm/EditRowForm";
 import FormModal from "../../ui_components/FormModal";
 import RequestTableFooter from "./RequestTableFooter";
 import deleteRequestHandler from "./DeleteRequestHandler";
-import RequestTableOptions from "./RequestTableOptions";
+import TableOptions from "../TableOptions";
 import { db } from "../../../pages/api/firebase";
 import ExportCSV from "../../csv/ExportCSV";
 import CSVImport from "../../csv/CSVImport";
@@ -54,17 +55,13 @@ const RequestTable: React.FC = () => {
   const [tableData, setTableData] = useState<DocumentData[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<DocumentData>([]);
-  const [isDeleting, setDeleting] = useState(false);
   const [editingRow, setEditingRow] = useState<Row<DocumentData>>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isPopoverOpen, setPopoverOpen] = useState<boolean>(false);
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 15,
   });
-
-  const toast = useToast();
 
   const pagination = React.useMemo(
     () => ({
@@ -110,6 +107,7 @@ const RequestTable: React.FC = () => {
         prevData.current = requests;
         requests.sort((a, b) => a.name.localeCompare(b.name));
         setFetchedData(requests);
+        3;
         setTableData(requests);
       });
     }
@@ -180,15 +178,6 @@ const RequestTable: React.FC = () => {
     setTableData(filteredData);
   }
 
-  const handleDelete = useCallback(() => {
-    deleteRequestHandler({
-      selectedRows: selectedRows,
-      setDeleting: setDeleting,
-      resetRowSelection: () => table.resetRowSelection(),
-      toast: toast,
-    });
-  }, [selectedRows]);
-
   const TableOptionButtons = (
     <ButtonGroup>
       <Button colorScheme="teal" onClick={onOpen}>
@@ -196,12 +185,10 @@ const RequestTable: React.FC = () => {
       </Button>
       <AddRequestModal isOpen={isOpen} onClose={onClose} />
       <DeleteRowPopover
-        handleDelete={handleDelete}
         isDisabled={!rowsSelected}
-        isDeleting={isDeleting}
-        isOpen={isPopoverOpen}
-        setOpen={setPopoverOpen}
         header="Delete selected requests"
+        selectedRows={selectedRows}
+        resetRowSelection={() => table.resetRowSelection()}
       >
         delete
       </DeleteRowPopover>
@@ -301,7 +288,7 @@ const RequestTable: React.FC = () => {
 
   return (
     <Flex direction="column" overflow="auto">
-      <RequestTableOptions
+      <TableOptions
         table={table}
         formatData={formatData}
         tableData={tableData}

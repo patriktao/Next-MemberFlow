@@ -11,32 +11,46 @@ import {
   Box,
   useToast,
 } from "@chakra-ui/react";
+import { Row } from "@tanstack/react-table";
+import { DocumentData } from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import { ReactNode } from "react";
+import deleteRequestHandler from "../tables/RequestTable/DeleteRequestHandler";
 import Spinner from "./Spinner";
 
 type Props = {
   children?: ReactNode;
-  handleDelete: Function;
   isDisabled?: boolean;
-  isDeleting?: boolean;
   variant?: string;
-  isOpen: boolean;
-  setOpen: Function;
   header?: string;
+  resetRowSelection: (() => void);
+  selectedRows: Row<DocumentData>[];
 };
 
 const DeleteRowPopover: React.FC<Props> = (props: Props) => {
+  const toast = useToast();
+  const [open, setOpen] = useState<boolean>(false);
+  const [isDeleting, setDeleting] = useState(false);
+
+  const handleDelete = useCallback(() => {
+    deleteRequestHandler({
+      selectedRows: props.selectedRows,
+      resetRowSelection: () => props.resetRowSelection(),
+      toast: toast,
+      setDeleting: setDeleting,
+    });
+  }, [props.selectedRows]);
+
   return (
     <Box>
-      <Popover isOpen={props.isOpen}>
+      <Popover isOpen={open}>
         <PopoverTrigger>
           <Button
-            onClick={() => props.setOpen(!props.isOpen)}
+            onClick={() => setOpen(!open)}
             isDisabled={props.isDisabled || false}
             variant={props.variant ?? "outline"}
-            colorScheme={props.isDeleting || !props.isDisabled ? "red" : "gray"}
-            isLoading={props.isDeleting || false}
+            colorScheme={isDeleting || !props.isDisabled ? "red" : "gray"}
+            isLoading={isDeleting || false}
             spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
           >
             {props.children}
@@ -44,7 +58,7 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
         </PopoverTrigger>
         <PopoverContent>
           <PopoverArrow />
-          <PopoverCloseButton onClick={() => props.setOpen(!props.isOpen)} />
+          <PopoverCloseButton onClick={() => setOpen(!open)} />
           <PopoverHeader pt={4} fontWeight="bold" border="0">
             {props.header}
           </PopoverHeader>
@@ -56,8 +70,8 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
               background="red.100"
               _hover={{ background: "red.50" }}
               onClick={() => {
-                props.setOpen(false);
-                props.handleDelete();
+                setOpen(false);
+                handleDelete();
               }}
             >
               delete

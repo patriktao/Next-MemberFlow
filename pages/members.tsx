@@ -8,13 +8,11 @@ type Props = {};
 
 function members({}: Props) {
   return (
-    <Layout title="Members">
+    <Layout>
       <Heading as="h1" size="lg" paddingBottom="1rem">
         members.
       </Heading>
-      <Grid>
-        <MemberTable />
-      </Grid>
+      <MemberTable />
     </Layout>
   );
 }

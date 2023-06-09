@@ -5,13 +5,11 @@ import NextLink from "next/link";
 interface NavItem {
   icon: ReactNode;
   title?: String;
-  description?: String;
   active?: boolean;
-  navSize: string;
   path: string;
 }
 
-const NavItem = ({ icon, title, description, active, navSize, path }) => {
+const NavItem = ({ icon, title, active, path }) => {
   return (
     <Flex
       mt={4}

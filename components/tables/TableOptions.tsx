@@ -11,16 +11,15 @@ interface Props {
   buttons: ReactNode;
 }
 
-const RequestTableOptions = (props: Props) => {
+const TableOptions = (props: Props) => {
   return (
     <Flex
-      id="request-table-options"
       justifyContent="space-between"
       flexFlow="wrap"
       marginBottom="1rem"
     >
       <Heading as="h3" size="md">
-        requests ({props.tableData.length ?? 0})
+        total: {props.tableData.length ?? 0}
       </Heading>
       <Flex columnGap="0.5rem">
         <ButtonGroup>
@@ -47,4 +46,4 @@ const RequestTableOptions = (props: Props) => {
   );
 };
 
-export default RequestTableOptions;
+export default TableOptions;

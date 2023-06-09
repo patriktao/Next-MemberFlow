@@ -21,7 +21,7 @@ export const IndeterminateCheckbox = ({
 
   return (
     <Box display="grid">
-      <Checkbox ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
+      <Checkbox colorScheme={"teal"} ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
     </Box>
   );
 };
