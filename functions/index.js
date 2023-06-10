@@ -6,15 +6,29 @@ const auxiliary = require("./auxiliary");
 const grantAdminRole = adminAPI.grantAdminRole;
 const stripAdminRole = adminAPI.stripAdminRole;
 const getExpDate = auxiliary.getExpDate;
+const documentExists = auxiliary.documentExists;
 const db = admin.firestore();
 
- 
+exports.createNewUser = functions.region("europe-central2").firestore.document("/requests/{uid}").onCreate((snap, context) => {
+  // context.params for the wildcards .
+  const uid = context.params.uid;
+  const data = snap.data()
+  return admin.auth().createUser({
+    uid: uid,
+    email: data.email,
+    password: data.ssn
+  }).then(() => {
+    return{
+      message: "Succesfully created new user. "
+    }
+  }).catch((error) => {
+    throw new functions.https.HttpsError("cancelled",`Something went wrong when creating new user: ` + error.message);
+  })
+})
 
-
-exports.newMemberStatus = functions.region("europe-central2").firestore.document("/members/{uid}/payments/{pid}").onCreate((snap, context) => {
+exports.newMemberStatus = functions.region("europe-central2").firestore.document("/members/{uid}/payments/{pid}").onCreate(async (snap, context) => {
     const uid = context.params.uid;
     const data = snap.data()
-    //created is the time in seconds since Unix epoch
     const {created, status, amount } = data
   
     if(status === "succeeded"){
@@ -25,49 +39,51 @@ exports.newMemberStatus = functions.region("europe-central2").firestore.document
         period = 12;    
       }
 
-      //Flytta medlemmen från request till members när personen har betalat.
-      db.doc("/request/" + uid).get().then((snap) => {
-        if(snap.exists){
-          const expDateTimestamp = getExpDate(snap)
+      const requestExists= await documentExists("/requests/" + uid)
+      const memberExists = await documentExists("/members/" + uid)
+
+      if(requestExists){
+        return db.doc("/requests/" + uid).get().then((snap) => {
+          const expDateTimestamp = getExpDate(snap.data().period)
           const newDoc= db.doc("/members/" + uid)
-          newDoc.create(data).then(() => {
-            newDoc.update({
+          return newDoc.update({
               exp_date : expDateTimestamp,
-              status: "active"
+              status: "active",
+              ...snap.data()
             }).then(() => {
-              return {
-                message: `Succesfully moved the user ${data.email} from request to members collection`
-              }
-            })
-            db.doc("/request/" + uid).delete().catch((error) => {
-              throw new functions.https.HttpsError("aborted",`Could not remove request document` + error.message);
-            })
+              updated = true
+              db.doc("/requests/" + uid).delete().catch((error) => {
+                throw new functions.https.HttpsError("aborted",`Could not remove request document` + error.message);
+              }).then(() => {
+                return {
+                  message: `Succesfully moved the user ${data.email} from request to members collection`
+                }
+              })
+            }).catch((error) => {
+            throw new functions.https.HttpsError("aborted",`Could not remove request document, something went wrong`, error.message);
           })
-          throw new functions.https.HttpsError("aborted",`Could not remove request document, something went wrong`);
-        }
-      })
-
-
-      //Lägg till kvarvarande tiden om personen redan är medlem. 
-      db.doc("/members/" + uid).get().then((snap) => {
-        if(snap.exists){
-          // Hämta kvarvarande tiden och uppdatera. 
-          // returnera om det utfördes. 
-          const expDateTimestamp = getExpDate(snap, true)
+          
+        })
+      }else if(memberExists){
+        return db.doc("/members/" + uid).get().then((snap) => {
+          /**
+           * exp_date is of type admin.firestore.Timestamp
+           */
+          const expTime = snap.data().exp_date.toMillis()
+          const expDateTimestamp = getExpDate(snap.data().period, expTime)
           db.doc("/members/" + uid).update({
             period: period,
             status: "active",
-            exp_date :expDateTimestamp
+            exp_date: expDateTimestamp
           }).then(() => {
             return {
               message: `Succesfully updated members (${data.email}) new`
             }
           })
-        }
       })
-
-      throw new functions.https.HttpsError("cancelled", "Something went wrong when updating the user membership. ");
-
+      }else{
+        throw new functions.https.HttpsError("not-found", "Could not find the member/request with the given uid. ");
+      }
     }
   })
 

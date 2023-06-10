@@ -1,18 +1,29 @@
 const admin = require("firebase-admin");
+const db = admin.firestore();
+const { Timestamp } = require('firebase-admin/firestore');
 
-function getExpDate(snap, timeleft = false){
+function getExpDate(period, expTime = 0){
 
-    const data = snap.data()
-    const period = parseInt(data.period)
-    const expDateSeconds = admin.firestore.Timestamp.now()._seconds + period*2629746
+    const intperiod = parseInt(period)
+    // The time now in milliseconds added with the paid period in milliseconds. 
+    const currentTimeMillis = new Date().getTime()
+    const expDateMS = currentTimeMillis + intperiod*2629746*1000
     let residTime = 0
-    if(timeleft){
-        residTime = data.exp_date._seconds - admin.firestore.Timestamp.now()._seconds
+    // Checks if there is any time left in the old membership. 
+    if(expTime > currentTimeMillis){
+        residTime = expTime - currentTimeMillis
     }
-    const expDateTimestamp = admin.firestore.Timestamp(getExpDate(snap) + residTime, 0)
+    const expDateTimestamp = Timestamp.fromMillis(expDateMS + residTime)
     return expDateTimestamp
 }
 
+async function documentExists(path){
+    return db.doc(path).get().then((snap) => {
+        return snap.exists
+    })
+}
+
 module.exports = {
-    getExpDate : getExpDate
+    getExpDate : getExpDate,
+    documentExists : documentExists
 }
