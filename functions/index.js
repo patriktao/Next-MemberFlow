@@ -3,31 +3,90 @@ const auth = require("firebase/auth")
 const admin = require("firebase-admin");
 admin.initializeApp();
 const adminAPI = require("./adminAPI");
+const auxiliary = require("./auxiliary");
 const grantAdminRole = adminAPI.grantAdminRole;
 const stripAdminRole = adminAPI.stripAdminRole;
+const getExpDate = auxiliary.getExpDate;
+const documentExists = auxiliary.documentExists;
+const db = admin.firestore();
 
-//Creates an user without a password. The user get's to choose a password via link sent to email. 
-exports.createUser = functions.region("europe-central2").https.onCall((data, context) => {
-    if (!context.auth){
-        throw new functions.https.HttpsError("permission-denied", "Request not authorized. User not authorized.")
+exports.createNewUser = functions.region("europe-central2").firestore.document("/requests/{uid}").onCreate((snap, context) => {
+  // context.params for the wildcards .
+  const uid = context.params.uid;
+  const data = snap.data()
+  return admin.auth().createUser({
+    uid: uid,
+    email: data.email,
+    password: data.ssn
+  }).then(() => {
+    return{
+      message: "Succesfully created new user. "
     }
+  }).catch((error) => {
+    throw new functions.https.HttpsError("cancelled",`Something went wrong when creating new user: ` + error.message);
+  })
+})
 
-    console.log(data.uid)
+exports.newMemberStatus = functions.region("europe-central2").firestore.document("/members/{uid}/payments/{pid}").onCreate(async (snap, context) => {
+    const uid = context.params.uid;
+    const data = snap.data()
+    const {created, status, amount } = data
+  
+    if(status === "succeeded"){
+      let period = 0;
+      if(amount === 5000){
+        period = 6;
+      }else if (amount === 7000){
+        period = 12;    
+      }
 
-    return admin.auth().createUser({
-        email: data.email,
-        uid: data.uid,
-        password: data.password
-    }).then((userRecord) => {
-        return {
-            message: "Successfully created new user: " + userRecord.uid
-        }
-    })
-    .catch((error) => {
-        throw new functions.https.HttpsError("Could not create a user: " + error.message);
-    })
-    
-});
+      const requestExists= await documentExists("/requests/" + uid)
+      const memberExists = await documentExists("/members/" + uid)
+
+      if(requestExists){
+        return db.doc("/requests/" + uid).get().then((snap) => {
+          const expDateTimestamp = getExpDate(snap.data().period)
+          const newDoc= db.doc("/members/" + uid)
+          return newDoc.update({
+              exp_date : expDateTimestamp,
+              status: "active",
+              ...snap.data()
+            }).then(() => {
+              updated = true
+              db.doc("/requests/" + uid).delete().catch((error) => {
+                throw new functions.https.HttpsError("aborted",`Could not remove request document` + error.message);
+              }).then(() => {
+                return {
+                  message: `Succesfully moved the user ${data.email} from request to members collection`
+                }
+              })
+            }).catch((error) => {
+            throw new functions.https.HttpsError("aborted",`Could not remove request document, something went wrong`, error.message);
+          })
+          
+        })
+      }else if(memberExists){
+        return db.doc("/members/" + uid).get().then((snap) => {
+          /**
+           * exp_date is of type admin.firestore.Timestamp
+           */
+          const expTime = snap.data().exp_date.toMillis()
+          const expDateTimestamp = getExpDate(snap.data().period, expTime)
+          db.doc("/members/" + uid).update({
+            period: period,
+            status: "active",
+            exp_date: expDateTimestamp
+          }).then(() => {
+            return {
+              message: `Succesfully updated members (${data.email}) new`
+            }
+          })
+      })
+      }else{
+        throw new functions.https.HttpsError("not-found", "Could not find the member/request with the given uid. ");
+      }
+    }
+  })
 
 exports.addAdmin = functions.region("europe-central2").https.onCall((data, context) => {
     //Checks if the authenticated token has admin role.
