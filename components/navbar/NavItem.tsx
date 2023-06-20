@@ -12,7 +12,7 @@ interface NavItem {
 const NavItem = ({ icon, title, active, path }) => {
   return (
     <Flex
-      mt={4}
+      mt={2}
       flexDir="column"
       w="100%"
       alignItems={{ base: "center", md: "flex-start" }}
@@ -20,7 +20,8 @@ const NavItem = ({ icon, title, active, path }) => {
       <Menu placement="right">
         <Link
           backgroundColor={active && "#AEC8CA"}
-          p={3}
+          px={4}
+          py={2}
           borderRadius={8}
           _hover={{ textDecor: "none", backgroundColor: "#AEC8CA" }}
           w={"full"}

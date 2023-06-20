@@ -58,7 +58,7 @@ const AuthForm: React.FC<Props> = (props: Props) => {
               "authToken",
               await getCurrentUser().getIdToken()
             );
-            router.push("/dashboard");
+            router.push("/home");
             console.log(getCurrentUser());
             setLoading(false);
           })

@@ -8,7 +8,7 @@ type Props = {};
 const requests = (props: Props) => {
   return (
     <Layout title="Dashboard">
-      <Heading as="h1" size="lg" paddingBottom="1rem">
+      <Heading as="h1" size="lg" fontWeight={"500"} pb="8px">
         requests.
       </Heading>
       <RequestTable />

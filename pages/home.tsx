@@ -3,10 +3,10 @@ import withAuth from "../components/auth/withAuth";
 import Layout from "../components/ui_components/Layout";
 import RequestTable from "../components/tables/RequestTable/RequestTable";
 
-const Dashboard = () => (
+const Home = () => (
   <Layout>
     <Heading as="h1" size="lg" pb="1rem" fontWeight={500}>
-      dashboard.
+      home.
     </Heading>
     <Heading as="h2" size="md" pb="1rem" fontWeight={400}>
       insights
@@ -20,4 +20,4 @@ const Dashboard = () => (
   </Layout>
 );
 
-export default withAuth(Dashboard);
+export default withAuth(Home);

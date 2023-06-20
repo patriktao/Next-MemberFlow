@@ -43,30 +43,34 @@ const Sidebar: React.FC = () => {
         });
       }
     };
+
+    const sidebarFocus = () => {
+      switch (pathname) {
+        case "/home":
+          setSelectedNavItem("/home");
+          break;
+        case "/requests":
+          setSelectedNavItem("/requests");
+          break;
+        case "/members":
+          setSelectedNavItem("/members");
+          break;
+        case "/archived":
+          setSelectedNavItem("/archived");
+          break;
+        case "/settings":
+          setSelectedNavItem("/settings");
+          break;
+        case "/admins":
+          setSelectedNavItem("/admins");
+        default:
+          break;
+      }
+    };
+
+    sidebarFocus();
     getUsername();
   }, []);
-
-  switch (pathname) {
-    case "/dashboard":
-      setSelectedNavItem("/dashboard");
-      break;
-    case "/requests":
-      setSelectedNavItem("/requests");
-      break;
-    case "/members":
-      setSelectedNavItem("/members");
-      break;
-    case "/archived":
-      setSelectedNavItem("/archived");
-      break;
-    case "/settings":
-      setSelectedNavItem("/settings");
-      break;
-    case "/admins":
-      setSelectedNavItem("/admins");
-    default:
-      break;
-  }
 
   const toast = useToast();
 
@@ -120,9 +124,9 @@ const Sidebar: React.FC = () => {
         <Divider display={{ base: "none", md: "block" }} mx="auto" w="120px" />
         <NavItem
           icon={FiHome}
-          title="dashbord"
-          active={selectedNavItem === "/dashboard"}
-          path="/dashboard"
+          title="home"
+          active={selectedNavItem === "/home"}
+          path="/home"
         />
         <NavItem
           icon={FiUserPlus}

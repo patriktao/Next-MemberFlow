@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react";
 import { DocumentData } from "firebase/firestore";
 import { CSVLink } from "react-csv";
 
@@ -8,14 +9,16 @@ type Props = {
 
 const ExportCSV = ({ data, fileName }: Props) => {
   return (
-    <CSVLink
-      data={data}
-      separator={";"}
-      target="_blank"
-      filename={fileName + ".csv"}
-    >
-      Export to CSV
-    </CSVLink>
+    <Box w="full">
+      <CSVLink
+        data={data}
+        separator={";"}
+        target="_blank"
+        filename={fileName + ".csv"}
+      >
+        Export to CSV
+      </CSVLink>
+    </Box>
   );
 };
 

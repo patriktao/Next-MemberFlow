@@ -45,7 +45,7 @@ const RequestTableColumns = (
           />
         </Box>
       ),
-      cell: ({ row }) => (
+      cell: ({ row }) => ( 
         <IndeterminateCheckbox
           {...{
             checked: row.getIsSelected(),

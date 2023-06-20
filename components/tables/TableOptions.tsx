@@ -15,10 +15,11 @@ const TableOptions = (props: Props) => {
   return (
     <Flex
       justifyContent="space-between"
+      alignItems="center"
       flexFlow="wrap"
       marginBottom="1rem"
     >
-      <Heading as="h3" size="md">
+      <Heading as="h3" size="md" fontWeight={400}>
         total: {props.tableData.length ?? 0}
       </Heading>
       <Flex columnGap="0.5rem">
