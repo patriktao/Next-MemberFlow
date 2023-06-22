@@ -21,9 +21,6 @@ const Layout: React.FC<Props> = ({
     </Head>
     <Sidebar />
     <Box
-      boxShadow="0px 16px 24px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 0px 1px rgba(0, 0, 0, 0.04)"
-      borderRadius="30px"
-      backgroundColor={component_color}
       w="full"
       maxH="full"
       overflow="auto"

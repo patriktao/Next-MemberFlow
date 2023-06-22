@@ -1,3 +1,4 @@
+import { useToast } from "@chakra-ui/react";
 import { Row } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
@@ -7,14 +8,12 @@ interface Props {
   selectedRows: Row<DocumentData>[];
   setDeleting: Function;
   resetRowSelection: Function;
-  toast: Function;
 }
 
 function deleteRequestHandler({
   selectedRows,
   setDeleting,
   resetRowSelection,
-  toast,
 }: Props): void {
   const deletePromise = new Promise(async (resolve, reject) => {
     setDeleting(true);
@@ -35,6 +34,8 @@ function deleteRequestHandler({
       reject(error); //otherwise reject and error.
     }
   });
+
+  const toast = useToast();
 
   deletePromise.then(
     (res) => {

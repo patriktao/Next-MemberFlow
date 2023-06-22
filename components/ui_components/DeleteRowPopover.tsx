@@ -28,7 +28,6 @@ type Props = {
 };
 
 const DeleteRowPopover: React.FC<Props> = (props: Props) => {
-  const toast = useToast();
   const [open, setOpen] = useState<boolean>(false);
   const [isDeleting, setDeleting] = useState(false);
 
@@ -36,7 +35,6 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
     deleteRequestHandler({
       selectedRows: props.selectedRows,
       resetRowSelection: () => props.resetRowSelection(),
-      toast: toast,
       setDeleting: setDeleting,
     });
   }, [props.selectedRows]);

@@ -1,42 +1,43 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
+import { MemberTypes } from "../../../types";
 import { getTimestamp } from "../../../utils/date-utils";
 
 const columnHelper = createColumnHelper<DocumentData>();
 
-export const columns = [
-  columnHelper.accessor("name", {
+export const MemberTableColumns = [
+  columnHelper.accessor(MemberTypes.name, {
     cell: (info) => info.getValue(),
     header: "Name",
   }),
-  columnHelper.accessor("ssn", {
+  columnHelper.accessor(MemberTypes.ssn, {
     cell: (info) => info.getValue(),
     header: "SSN",
   }),
-  columnHelper.accessor("email", {
+  columnHelper.accessor(MemberTypes.email, {
     cell: (info) => info.getValue(),
     header: "Email",
     meta: {
       isNumeric: true,
     },
   }),
-  columnHelper.accessor("gender", {
+  columnHelper.accessor(MemberTypes.gender, {
     cell: (info) => info.getValue(),
     header: "Gender",
   }),
-  columnHelper.accessor("reg_date", {
+  columnHelper.accessor(MemberTypes.reg_date, {
     cell: (info) => getTimestamp(info.getValue()),
-    header: "Reg Date",
+    header: "Reg Date2",
   }),
-  columnHelper.accessor("exp_date", {
+  columnHelper.accessor(MemberTypes.exp_date, {
     cell: (info) => getTimestamp(info.getValue()),
     header: "Exp Date",
   }),
-  columnHelper.accessor("period", {
+  columnHelper.accessor(MemberTypes.period, {
     cell: (info) => info.getValue(),
     header: "Period",
   }),
-  columnHelper.accessor("status", {
+  columnHelper.accessor(MemberTypes.status, {
     cell: (info) => info.getValue(),
     header: "Status",
   }),

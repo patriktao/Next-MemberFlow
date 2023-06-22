@@ -5,11 +5,15 @@ import {
   Box,
   Text,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { PaginationState, Row, Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
+import { createMember } from "../../../pages/api/memberAPI/memberAPI";
+import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
 import Alert from "../../ui_components/Alert";
 import Select from "../../ui_components/Select";
+import displayToast from "../../ui_components/Toast";
 import { IndeterminateCheckbox } from "./RequestTableColumns";
 
 interface Props {
@@ -19,6 +23,52 @@ interface Props {
 
 const RequestTableFooter = ({ selectedRows, table }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const toast = useToast();
+
+  function acceptRequests(): void {
+    const createPromise = new Promise(async (resolve, reject) => {
+      const promises = selectedRows.flatMap((row) => {
+        return new Promise((resolve, reject) => {
+          createMember(row.original)
+            .then((res) => {
+              deleteRequest(row.original.requestId)
+                .then((res) => resolve(res))
+                .catch((error) => reject(error));
+              resolve(res);
+            })
+            .catch((error) => reject(error));
+        });
+      });
+
+      try {
+        const results = await Promise.all(promises); //waiting until all promises fulfilled
+        resolve(results); //then we are done
+      } catch (error) {
+        reject(error); //otherwise reject and error.
+      }
+    });
+
+    createPromise.then(
+      (res) => {
+        displayToast({
+          toast: toast,
+          title: "Successfully accepted requests",
+          status: "success",
+        });
+        table.resetRowSelection();
+        onClose();
+      },
+      (error) => {
+        console.log(error);
+        displayToast({
+          toast: toast,
+          title: "Error accepting requests",
+          status: "error",
+        });
+      }
+    );
+  }
 
   return (
     <Flex
@@ -50,10 +100,10 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
               table.setPageSize(Number(e.target.value));
             }}
           >
+            <option value={10}>10</option>
             <option value={15}>15</option>
             <option value={20}>20</option>
             <option value={25}>25</option>
-            <option value={30}>30</option>
           </Select>
         </Flex>
         <Box flexDirection="row">
@@ -98,11 +148,11 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
           isDisabled={selectedRows.length === 0}
           onClick={onOpen}
         >
-          accept requests
+          accept
         </Button>
         <Alert
           isOpen={isOpen}
-          onClose={onClose}
+          onClose={acceptRequests}
           header={"Accept Requests"}
           body={"Are you sure? You can't undo this action afterwards."}
         />

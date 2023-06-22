@@ -39,11 +39,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import type { DocumentData } from "firebase/firestore";
 import { db } from "../../../pages/api/firebase";
-import { columns } from "./MemberTableColumns";
+import { MemberTableColumns } from "./MemberTableColumns";
 import { hover_color } from "../../../styles/colors";
 import FormModal from "../../ui_components/FormModal";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import RequestTableColumns from "../RequestTable/RequestTableColumns";
+import TableOptions from "../TableOptions";
 
 export function MemberTable() {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -60,8 +61,6 @@ export function MemberTable() {
     pageIndex: 0,
     pageSize: 15,
   });
-
-  const toast = useToast();
 
   const pagination = React.useMemo(
     () => ({
@@ -80,19 +79,19 @@ export function MemberTable() {
           switch (type) {
             case "added":
               if (
-                !members.find((member: DocumentData) => member.id === data.id)
+                !members.find((member: DocumentData) => member.id === doc.id)
               ) {
                 members.push(data);
               }
               break;
             case "removed":
               members = members.filter(
-                (member: DocumentData) => member.id !== data.id
+                (member: DocumentData) => member.id !== doc.id
               );
               break;
             case "modified":
               members = members.filter(
-                (member: DocumentData) => member.id !== data.id
+                (member: DocumentData) => member.id !== doc.id
               );
               members.push(data.id);
               break;
@@ -125,7 +124,7 @@ export function MemberTable() {
 
   /* TABLE */
   const table = useReactTable({
-    columns: RequestTableColumns(editRow),
+    columns: MemberTableColumns,
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -159,9 +158,6 @@ export function MemberTable() {
     setEditingRow(null);
   }, [editingRow]);
 
-  const tableOptions = () => {
-    
-  }
 
   const tableComponent = (
     <Table size={{ base: "sm" }} overflow={"auto"}>
@@ -234,5 +230,29 @@ export function MemberTable() {
     </Table>
   );
 
-  return tableComponent;
+  function formatData(searchTerm: string): void {
+    let filteredData = fetchedData;
+    if (searchTerm.length !== 0) {
+      filteredData = fetchedData.filter(
+        (document: DocumentData) =>
+          document.name.toLowerCase().includes(searchTerm) ||
+          document.email.toLowerCase().includes(searchTerm) ||
+          document.ssn.toLowerCase().includes(searchTerm)
+      );
+    }
+    setTableData(filteredData);
+  }
+
+  return (
+    <>
+      <TableOptions
+        formatData={formatData}
+        tableData={tableData}
+        rowsSelected={rowsSelected}
+        table={table}
+        buttons={""}
+      />
+      {tableComponent}
+    </>
+  );
 }

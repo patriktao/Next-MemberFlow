@@ -7,12 +7,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider>
       <NavProvider>
-        <Box
-          title="layout"
-          w="100vw"
-          h="100vh"
-          background={bg_color}
-        >
+        <Box title="layout" w="100vw" h="100vh">
           <Component {...pageProps} />
         </Box>
       </NavProvider>

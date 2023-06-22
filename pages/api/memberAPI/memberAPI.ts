@@ -3,24 +3,40 @@ import moment from "moment";
 import { calculateNextDate } from "../../../utils/date-utils";
 import { v4 } from "uuid";
 import { db } from "../firebase";
+import { MemberForm } from "../../../interfaces";
 
 const memberCollection = collection(db, "members");
 
-export async function createMember(props) {
+export async function createMember(form) {
   try {
     /* Create primary key */
     const uid = v4();
     /* Registration Date */
-    const reg_date = Timestamp.now();
+    const regDate = Timestamp.now();
     /* Calculate expiration date using Moment */
-    const next_date = calculateNextDate(
-      moment(reg_date.toDate()),
-      parseInt(props.period)
+    const exp = calculateNextDate(
+      moment(regDate.toDate()),
+      parseInt(form.period)
     );
     /* Convert to Timestamp object for Firebase */
-    const exp_date = Timestamp.fromDate(next_date.toDate());
+    const expDate = Timestamp.fromDate(exp.toDate());
 
-    return await setDoc(doc(memberCollection, uid), {});
+    /* Create Form */
+    const memberForm: MemberForm = {
+      name: form.name,
+      email: form.email,
+      period: form.period,
+      gender: form.gender,
+      reg_date: regDate,
+      exp_date: expDate,
+      ssn: form.ssn,
+      status: "active",
+    };
+    console.log(memberForm);
+
+    return await setDoc(doc(memberCollection, uid), memberForm).catch((error) =>
+      console.error(error)
+    );
   } catch (error) {
     console.log(error);
   }

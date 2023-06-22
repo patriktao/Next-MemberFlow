@@ -60,7 +60,7 @@ const RequestTable: React.FC = () => {
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 20,
+    pageSize: 10,
   });
 
   const pagination = React.useMemo(
@@ -219,7 +219,7 @@ const RequestTable: React.FC = () => {
     <Table size="sm" overflow={"auto"}>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <Tr key={headerGroup.id}>
+          <Tr key={headerGroup.id} >
             {headerGroup.headers.map((header) => {
               const meta: any = header.column.columnDef.meta;
               return (
@@ -259,7 +259,7 @@ const RequestTable: React.FC = () => {
                       key={cell.id}
                       isNumeric={meta?.isNumeric}
                       background={isRowSelected(row) ? hover_color : ""}
-                      py="0"
+                      py="1.5"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

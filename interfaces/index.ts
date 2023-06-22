@@ -12,3 +12,14 @@ export interface RequestForm {
   regDate: Timestamp;
   hasPaid: string;
 }
+
+export interface MemberForm {
+  name: string;
+  email: string;
+  period: string;
+  gender: string;
+  reg_date: Timestamp;
+  exp_date: Timestamp;
+  ssn: string;
+  status: string;
+}

@@ -1,3 +1,4 @@
+import { m } from "framer-motion";
 import { mapToOptions } from "../utils";
 
 export const RequestTypes = {
@@ -11,6 +12,17 @@ export const RequestTypes = {
   regDate: "regDate",
   hasPaid: "hasPaid",
   requestId: "requestId",
+};
+
+export const MemberTypes = {
+  name: "name",
+  email: "email",
+  period: "period",
+  gender: "gender",
+  reg_date: "reg_date",
+  exp_date: "exp_date",
+  ssn: "ssn",
+  status: "status",
 };
 
 export const paymentMethods: string[] = ["swish", "cash", "stripe", "card"];

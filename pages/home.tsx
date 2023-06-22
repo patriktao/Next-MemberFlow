@@ -5,17 +5,14 @@ import RequestTable from "../components/tables/RequestTable/RequestTable";
 
 const Home = () => (
   <Layout>
-    <Heading as="h1" size="lg" pb="1rem" fontWeight={500}>
-      home.
+    <Heading as="h1" size="lg" pb="1rem" fontWeight={600}>
+      home
     </Heading>
     <Heading as="h2" size="md" pb="1rem" fontWeight={400}>
       insights
     </Heading>
     <Grid templateColumns="repeat(4, 1fr)" gap={6}>
-      <GridItem w="100%" h="270" bg="gray.500" rounded={"3xl"}></GridItem>
-      <GridItem w="100%" h="270" bg="gray.500" rounded={"3xl"}></GridItem>
-      <GridItem w="100%" h="270" bg="gray.500" rounded={"3xl"}></GridItem>
-      <GridItem w="100%" h="270" bg="gray.500" rounded={"3xl"}></GridItem>
+
     </Grid>
   </Layout>
 );
