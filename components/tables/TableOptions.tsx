@@ -1,14 +1,29 @@
-import { Flex, Heading, ButtonGroup, Button, Input } from "@chakra-ui/react";
-import { Table } from "@tanstack/react-table";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import {
+  Flex,
+  Heading,
+  ButtonGroup,
+  Button,
+  Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/react";
+import { Row, Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import { ChangeEvent, ReactNode } from "react";
+import CSVImport from "../csv/CSVImport";
+import ExportCSV from "../csv/ExportCSV";
 
 interface Props {
   formatData: Function;
   tableData: DocumentData[];
-  rowsSelected: boolean;
+  areRowsSelected: boolean;
   table: Table<DocumentData>;
-  buttons: ReactNode;
+  extraOptions?: ReactNode;
+  selectedRows: Row<DocumentData>[];
+  CSVImportFunction: Function;
 }
 
 const TableOptions = (props: Props) => {
@@ -27,7 +42,7 @@ const TableOptions = (props: Props) => {
           <Button
             variant="outline"
             colorScheme="teal"
-            isDisabled={!props.rowsSelected}
+            isDisabled={!props.areRowsSelected}
             onClick={() => props.table.resetRowSelection()}
           >
             deselect
@@ -41,7 +56,27 @@ const TableOptions = (props: Props) => {
             }}
           />
         </ButtonGroup>
-        {props.buttons}
+        {props.extraOptions}
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+            actions
+          </MenuButton>
+          <MenuList>
+            <MenuItem>
+              <CSVImport onSubmit={props.CSVImportFunction} />
+            </MenuItem>
+            <MenuItem>
+              <ExportCSV
+                data={
+                  props.selectedRows.length == 0
+                    ? props.tableData
+                    : props.selectedRows.flatMap((row) => row.original)
+                }
+                fileName="requests"
+              />
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
     </Flex>
   );

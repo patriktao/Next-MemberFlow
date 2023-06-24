@@ -7,23 +7,9 @@ import {
   Th,
   Td,
   chakra,
-  Box,
-  Heading,
-  Flex,
-  Button,
-  Spacer,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import {
-  ChevronDownIcon,
-  TriangleDownIcon,
-  TriangleUpIcon,
-} from "@chakra-ui/icons";
+import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
   useReactTable,
   flexRender,
@@ -45,6 +31,7 @@ import FormModal from "../../ui_components/FormModal";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import RequestTableColumns from "../RequestTable/RequestTableColumns";
 import TableOptions from "../TableOptions";
+import { memberImport } from "../../csv/ImportHandlers";
 
 export function MemberTable() {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -144,7 +131,7 @@ export function MemberTable() {
   const selectedRows: Row<DocumentData>[] =
     table.getSelectedRowModel().flatRows;
 
-  const rowsSelected: boolean = selectedRows.length > 0;
+  const areRowsSelected: boolean = selectedRows.length > 0;
 
   function isRowSelected(selected: Row<DocumentData>): Boolean {
     return Boolean(
@@ -157,7 +144,6 @@ export function MemberTable() {
   const closeEdit = useCallback((): void => {
     setEditingRow(null);
   }, [editingRow]);
-
 
   const tableComponent = (
     <Table size={{ base: "sm" }} overflow={"auto"}>
@@ -248,9 +234,10 @@ export function MemberTable() {
       <TableOptions
         formatData={formatData}
         tableData={tableData}
-        rowsSelected={rowsSelected}
+        areRowsSelected={areRowsSelected}
         table={table}
-        buttons={""}
+        selectedRows={selectedRows}
+        CSVImportFunction={memberImport}
       />
       {tableComponent}
     </>

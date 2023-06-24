@@ -1,7 +1,6 @@
 import { Box, Text, useDisclosure, useToast } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import { ReactSpreadsheetImport } from "react-spreadsheet-import";
-import { createNewRequest } from "../../pages/api/requestAPI/requestAPI";
 import {
   genderOptions,
   paymentOptions,
@@ -9,11 +8,36 @@ import {
   yesNoOptions,
 } from "../../types";
 import FormModal from "../ui_components/FormModal";
-import displayToast from "../ui_components/Toast";
-import { v4 } from "uuid";
-import { toTimestamp } from "../../utils/date-utils";
-import { RequestForm } from "../../interfaces";
 import { Result } from "../../node_modules/react-spreadsheet-import/types/types.js";
+
+const CSVImport = ({ onSubmit }: { onSubmit: Function }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  function handleSubmit(data: Result<string>) {
+    onSubmit();
+  }
+
+  return (
+    <Box onClick={onOpen} w="full">
+      <Text>Import</Text>
+      <FormModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={"Import CSV"}
+        size="4xl"
+      >
+        {
+          <ReactSpreadsheetImport
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={handleSubmit}
+            fields={fields}
+          />
+        }
+      </FormModal>
+    </Box>
+  );
+};
 
 const fields = [
   {
@@ -114,7 +138,11 @@ const fields = [
   {
     label: "period",
     key: "period",
-    alternateMatches: ["subscription", "membership_period", "membership period"],
+    alternateMatches: [
+      "subscription",
+      "membership_period",
+      "membership period",
+    ],
     fieldType: {
       type: "select",
       options: periodOptions,
@@ -179,106 +207,6 @@ const fields = [
       },
     ],
   },
-] as const;
-
-const CSVImport = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const toast = useToast();
-
-  function handleSubmit(data: Result<string>) {
-    if (data == undefined || data == null) {
-      console.log("result is undefined or null");
-      return;
-    } else if (data.validData.length === 0) {
-      displayToast({
-        toast: toast,
-        title: "No valid data has been submitted.",
-        description: "Try again",
-        status: "error",
-        position: "top",
-      });
-      console.log("invalid data:");
-      console.log(data.invalidData);
-      return;
-    }
-    //console.log(data.invalidData);
-    //console.log(data.validData);
-
-    const createRequestPromise = new Promise(async (resolve, reject) => {
-      //Promise for every delete
-      const promises = data.validData.flatMap((e) => {
-        const uid = v4();
-        const requestForm: RequestForm = {
-          email: e.email as string,
-          name: e.name as string,
-          ssn: e.ssn as string,
-          gender: e.gender as string,
-          afMember: e.afMember as string,
-          payMethod: e.payMethod as string,
-          period: e.period as string,
-          regDate: toTimestamp(new Date(e.regDate as string)),
-          hasPaid: e.hasPaid as string,
-          requestId: uid,
-        };
-
-        return new Promise((resolve, reject) => {
-          createNewRequest(requestForm)
-            .then((res) => resolve(res))
-            .catch((error) => reject(error));
-        });
-      });
-
-      try {
-        const results = await Promise.all(promises); //waiting until all promises fulfilled
-        resolve(results);
-      } catch (error) {
-        reject(error);
-      }
-    });
-
-    createRequestPromise.then(
-      (res) => {
-        displayToast({
-          toast: toast,
-          title: "Successfully added a new request.",
-          status: "success",
-          position: "top",
-        });
-      },
-      (error) => {
-        console.log(error);
-        displayToast({
-          toast: toast,
-          title: "Error adding a new request.",
-          description: error.message,
-          status: "error",
-          position: "top",
-        });
-      }
-    );
-  }
-
-  return (
-    <Box onClick={onOpen} w="full">
-      <Text>Import</Text>
-      <FormModal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={"Import CSV"}
-        size="4xl"
-      >
-        {
-          <ReactSpreadsheetImport
-            isOpen={isOpen}
-            onClose={onClose}
-            onSubmit={handleSubmit}
-            fields={fields}
-          />
-        }
-      </FormModal>
-    </Box>
-  );
-};
+];
 
 export default CSVImport;

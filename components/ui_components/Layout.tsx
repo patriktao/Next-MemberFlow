@@ -9,10 +9,7 @@ type Props = {
   title?: string;
 };
 
-const Layout: React.FC<Props> = ({
-  children,
-  title = "This is the default title",
-}: Props) => (
+const Layout: React.FC<Props> = ({ children, title = "Memberflow" }: Props) => (
   <Flex padding="1rem" columnGap="1rem" h="100%">
     <Head>
       <title>{title}</title>
@@ -20,12 +17,7 @@ const Layout: React.FC<Props> = ({
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Head>
     <Sidebar />
-    <Box
-      w="full"
-      maxH="full"
-      overflow="auto"
-      padding="2rem"
-    >
+    <Box w="full" maxH="full" overflow="auto" padding="2rem">
       {children}
     </Box>
   </Flex>

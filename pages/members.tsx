@@ -8,7 +8,7 @@ type Props = {};
 
 function members({}: Props) {
   return (
-    <Layout>
+    <Layout title="Members">
       <Heading as="h1" size="lg" paddingBottom="1rem">
         members.
       </Heading>

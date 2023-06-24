@@ -18,8 +18,8 @@ export interface MemberForm {
   email: string;
   period: string;
   gender: string;
-  reg_date: Timestamp;
-  exp_date: Timestamp;
+  reg_date?: Timestamp;
+  exp_date?: Timestamp;
   ssn: string;
   status: string;
 }

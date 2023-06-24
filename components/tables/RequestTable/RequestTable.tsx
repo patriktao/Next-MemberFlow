@@ -48,6 +48,7 @@ import TableOptions from "../TableOptions";
 import { db } from "../../../pages/api/firebase";
 import ExportCSV from "../../csv/ExportCSV";
 import CSVImport from "../../csv/CSVImport";
+import { requestImport } from "../../csv/ImportHandlers";
 
 const RequestTable: React.FC = () => {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -155,7 +156,7 @@ const RequestTable: React.FC = () => {
   const selectedRows: Row<DocumentData>[] =
     table.getSelectedRowModel().flatRows;
 
-  const rowsSelected: boolean = selectedRows.length > 0;
+  const areRowsSelected: boolean = selectedRows.length > 0;
 
   function isRowSelected(selected: Row<DocumentData>): Boolean {
     return Boolean(
@@ -178,40 +179,20 @@ const RequestTable: React.FC = () => {
     setTableData(filteredData);
   }
 
-  const TableOptionButtons = (
+  const extraOptions = (
     <ButtonGroup>
       <Button colorScheme="teal" onClick={onOpen}>
         add
       </Button>
       <AddRequestModal isOpen={isOpen} onClose={onClose} />
       <DeleteRowPopover
-        isDisabled={!rowsSelected}
+        isDisabled={!areRowsSelected}
         header="Delete selected requests"
         selectedRows={selectedRows}
         resetRowSelection={() => table.resetRowSelection()}
       >
         delete
       </DeleteRowPopover>
-      <Menu>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-          actions
-        </MenuButton>
-        <MenuList>
-          <MenuItem>
-            <CSVImport />
-          </MenuItem>
-          <MenuItem>
-            <ExportCSV
-              data={
-                selectedRows.length == 0
-                  ? tableData
-                  : selectedRows.flatMap((row) => row.original)
-              }
-              fileName="requests"
-            />
-          </MenuItem>
-        </MenuList>
-      </Menu>
     </ButtonGroup>
   );
 
@@ -219,7 +200,7 @@ const RequestTable: React.FC = () => {
     <Table size="sm" overflow={"auto"}>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <Tr key={headerGroup.id} >
+          <Tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => {
               const meta: any = header.column.columnDef.meta;
               return (
@@ -293,8 +274,10 @@ const RequestTable: React.FC = () => {
         table={table}
         formatData={formatData}
         tableData={tableData}
-        rowsSelected={rowsSelected}
-        buttons={TableOptionButtons}
+        areRowsSelected={areRowsSelected}
+        extraOptions={extraOptions}
+        selectedRows={selectedRows}
+        CSVImportFunction={requestImport}
       />
       <Box h="100%" overflow="auto">
         {TableComponent}

@@ -7,7 +7,7 @@ type Props = {};
 
 const requests = (props: Props) => {
   return (
-    <Layout title="Dashboard">
+    <Layout title="Requests">
       <Heading as="h1" size="lg" fontWeight={"600"} pb="8px">
         requests
       </Heading>
