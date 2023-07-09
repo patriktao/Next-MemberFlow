@@ -9,15 +9,9 @@ import {
   chakra,
   Flex,
   Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   useDisclosure,
-  useToast,
   Box,
   ButtonGroup,
-  Icon,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -43,12 +37,10 @@ import RequestTableColumns from "./RequestTableColumns";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import FormModal from "../../ui_components/FormModal";
 import RequestTableFooter from "./RequestTableFooter";
-import deleteRequestHandler from "./DeleteRequestHandler";
 import TableOptions from "../TableOptions";
 import { db } from "../../../pages/api/firebase";
-import ExportCSV from "../../csv/ExportCSV";
-import CSVImport from "../../csv/CSVImport";
-import { requestImport } from "../../csv/ImportHandlers";
+import { requestImport } from "../../csv/ImportHooks";
+import { deleteRequestHook } from "../../../hooks/RequestHooks";
 
 const RequestTable: React.FC = () => {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -61,7 +53,7 @@ const RequestTable: React.FC = () => {
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 20,
   });
 
   const pagination = React.useMemo(
@@ -108,7 +100,6 @@ const RequestTable: React.FC = () => {
         prevData.current = requests;
         requests.sort((a, b) => a.name.localeCompare(b.name));
         setFetchedData(requests);
-        3;
         setTableData(requests);
       });
     }
@@ -179,17 +170,28 @@ const RequestTable: React.FC = () => {
     setTableData(filteredData);
   }
 
+  const [isDeleting, setDeleting] = useState<boolean>(false);
+
+  /* Delete Member */
+  const handleDelete = useCallback(() => {
+    deleteRequestHook({
+      selectedRows: [editingRow],
+      resetRowSelection: () => table.resetRowSelection(),
+      setDeleting: setDeleting,
+    });
+  }, [editingRow]);
+
   const extraOptions = (
     <ButtonGroup>
-      <Button colorScheme="teal" onClick={onOpen}>
+      <Button colorScheme="teal" onClick={onOpen} size="sm">
         add
       </Button>
       <AddRequestModal isOpen={isOpen} onClose={onClose} />
       <DeleteRowPopover
+        handleDelete={handleDelete}
         isDisabled={!areRowsSelected}
         header="Delete selected requests"
-        selectedRows={selectedRows}
-        resetRowSelection={() => table.resetRowSelection()}
+        isDeleting={isDeleting}
       >
         delete
       </DeleteRowPopover>
@@ -240,7 +242,7 @@ const RequestTable: React.FC = () => {
                       key={cell.id}
                       isNumeric={meta?.isNumeric}
                       background={isRowSelected(row) ? hover_color : ""}
-                      py="1.5"
+                      py="0"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -259,7 +261,12 @@ const RequestTable: React.FC = () => {
                   title={"Edit Request"}
                   size="3xl"
                 >
-                  <EditRowForm row={editingRow} onClose={closeEdit} />
+                  <EditRowForm
+                    row={editingRow}
+                    onClose={closeEdit}
+                    handleDelete={handleDelete}
+                    isDeleting={isDeleting}
+                  />
                 </FormModal>
               )}
           </>

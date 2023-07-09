@@ -1,30 +1,10 @@
 import { EditIcon } from "@chakra-ui/icons";
-import { Box, Button, Checkbox } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
-import { HTMLProps, useEffect, useRef } from "react";
 import { RequestTypes } from "../../../types";
 import { getTimestamp } from "../../../utils/date-utils";
-
-export const IndeterminateCheckbox = ({
-  indeterminate,
-  className = "",
-  ...rest
-}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) => {
-  const ref = useRef<HTMLInputElement>(null!);
-
-  useEffect(() => {
-    if (typeof indeterminate === "boolean") {
-      ref.current.indeterminate = !rest.checked && indeterminate;
-    }
-  }, [ref, indeterminate]);
-
-  return (
-    <Box display="grid">
-      <Checkbox colorScheme={"teal"} ref={ref} isChecked={rest.checked} onChange={rest.onChange} />
-    </Box>
-  );
-};
+import TableRowCheckbox from "../../ui_components/TableRowCheckbox";
 
 const RequestTableColumns = (
   editRow: Function
@@ -36,7 +16,7 @@ const RequestTableColumns = (
       id: "select",
       header: ({ table }) => (
         <Box display="flex">
-          <IndeterminateCheckbox
+          <TableRowCheckbox
             {...{
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
@@ -46,7 +26,7 @@ const RequestTableColumns = (
         </Box>
       ),
       cell: ({ row }) => ( 
-        <IndeterminateCheckbox
+        <TableRowCheckbox
           {...{
             checked: row.getIsSelected(),
             disabled: !row.getCanSelect(),

@@ -27,17 +27,14 @@ import {
 } from "@chakra-ui/react";
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
-import { RequestForm } from "../../../interfaces";
 import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
-import { RequestTypes } from "../../../types";
 import { membershipPeriods, paymentMethods } from "../../../types";
 import InputEmail from "../../ui_components/InputEmail";
-import LoadingButton from "../../ui_components/LoadingButton";
+import LoadingSubmitButton from "../../ui_components/LoadingSubmitButton";
 import displayToast from "../../ui_components/Toast";
 import GDPR from "./GDPR/GDPR";
-import { createUser } from "../../../pages/api/requestAPI/requestAPI";
 import { v4 } from "uuid";
-
+import { createRequestHook } from "../../../hooks/RequestHooks";
 interface Props {
   onCancel: Function;
 }
@@ -103,27 +100,12 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
       uid: uid,
     };
 
-    await createNewRequest(requestForm)
-      .then(() => {
-        console.log("RequestForm uid: ", requestForm.uid);
-        displayToast({
-          toast: toast,
-          title: "Successfully added a new request.",
-          status: "success",
-          position: "right-top",
-        });
-        props.onCancel();
-        resetForm();
-      })
-      .catch((error) => {
-        setErrorMessage(error.message);
-        displayToast({
-          toast: toast,
-          title: "Error adding a new request.",
-          description: error.message,
-          status: "error",
-        });
-      });
+    createRequestHook({
+      requestForm: requestForm,
+      onCancel: props.onCancel(),
+      reset: () => resetForm(),
+      setErrorMessage: setErrorMessage,
+    });
     setLoading(false);
   };
 
@@ -269,13 +251,13 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
           <Button variant="outline" onClick={() => props.onCancel()}>
             Cancel
           </Button>
-          <LoadingButton
+          <LoadingSubmitButton
             color="teal"
             isLoading={isLoading}
             isDisabled={!isFilled}
           >
             Save
-          </LoadingButton>
+          </LoadingSubmitButton>
         </ButtonGroup>
       </form>
     </Grid>

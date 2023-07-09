@@ -1,27 +1,27 @@
 import { useToast } from "@chakra-ui/react";
 import { Row } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
-import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
-import displayToast from "../../ui_components/Toast";
+import displayToast from "../components/ui_components/Toast";
+import { deleteMember } from "../pages/api/memberAPI/memberAPI";
 
-interface Props {
+interface deleteProps {
   selectedRows: Row<DocumentData>[];
   setDeleting: Function;
   resetRowSelection: Function;
 }
 
-function deleteRequestHandler({
+export function deleteMemberHook({
   selectedRows,
   setDeleting,
   resetRowSelection,
-}: Props): void {
+}: deleteProps): void {
   const deletePromise = new Promise(async (resolve, reject) => {
     setDeleting(true);
 
     const promises = selectedRows.flatMap((e) => {
       //Promise for every delete
       return new Promise((resolve, reject) => {
-        deleteRequest(e.original.requestId)
+        deleteMember(e.original.memberId)
           .then((res) => resolve(res))
           .catch((error) => reject(error));
       });
@@ -41,7 +41,7 @@ function deleteRequestHandler({
     (res) => {
       displayToast({
         toast: toast,
-        title: "Successfully removed requests.",
+        title: "Successfully removed member.",
         status: "success",
       });
       resetRowSelection();
@@ -51,12 +51,10 @@ function deleteRequestHandler({
       console.log(error);
       displayToast({
         toast: toast,
-        title: "Error removing requests.",
+        title: "Error removing member.",
         status: "error",
       });
       setDeleting(false);
     }
   );
 }
-
-export default deleteRequestHandler;

@@ -44,10 +44,12 @@ const TableOptions = (props: Props) => {
             colorScheme="teal"
             isDisabled={!props.areRowsSelected}
             onClick={() => props.table.resetRowSelection()}
+            size="sm"
           >
             deselect
           </Button>
           <Input
+            size="sm"
             placeholder="search name, email, ssn etc..."
             w={{ base: "300px", lg: "400px" }}
             maxW={{ base: "300px", lg: "400px" }}
@@ -58,7 +60,7 @@ const TableOptions = (props: Props) => {
         </ButtonGroup>
         {props.extraOptions}
         <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} size="sm">
             actions
           </MenuButton>
           <MenuList>

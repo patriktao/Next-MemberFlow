@@ -16,7 +16,6 @@ import {
   getCoreRowModel,
   SortingState,
   getSortedRowModel,
-  isRowSelected,
   Row,
   PaginationState,
   getPaginationRowModel,
@@ -25,13 +24,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import type { DocumentData } from "firebase/firestore";
 import { db } from "../../../pages/api/firebase";
-import { MemberTableColumns } from "./MemberTableColumns";
+import MemberTableColumns from "./MemberTableColumns";
 import { hover_color } from "../../../styles/colors";
 import FormModal from "../../ui_components/FormModal";
 import EditRowForm from "../EditRowForm/EditRowForm";
-import RequestTableColumns from "../RequestTable/RequestTableColumns";
 import TableOptions from "../TableOptions";
-import { memberImport } from "../../csv/ImportHandlers";
+import { memberImport } from "../../csv/ImportHooks";
+import { deleteMemberHook } from "../../../hooks/MemberHooks";
 
 export function MemberTable() {
   const [fetchedData, setFetchedData] = useState<DocumentData[]>([]);
@@ -46,7 +45,7 @@ export function MemberTable() {
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 15,
+    pageSize: 20,
   });
 
   const pagination = React.useMemo(
@@ -62,31 +61,33 @@ export function MemberTable() {
       onSnapshot(collection(db, "members"), (snapshot) => {
         let members = prevData.current.map((x) => x);
         snapshot.docChanges().forEach(({ doc, type }) => {
-          const data = doc.data();
           switch (type) {
             case "added":
               if (
-                !members.find((member: DocumentData) => member.id === doc.id)
+                !members.some(
+                  (member: DocumentData) => member.memberId === doc.id
+                )
               ) {
-                members.push(data);
+                members.push(doc.data());
               }
               break;
             case "removed":
               members = members.filter(
-                (member: DocumentData) => member.id !== doc.id
+                (member: DocumentData) => member.memberId !== doc.id
               );
               break;
             case "modified":
               members = members.filter(
-                (member: DocumentData) => member.id !== doc.id
+                (member: DocumentData) => member.memberId !== doc.id
               );
-              members.push(data.id);
+              members.push(doc.data());
               break;
             default:
               break;
           }
         });
         prevData.current = members;
+        members.sort((a, b) => a.name.localeCompare(b.name));
         setFetchedData(members);
         setTableData(members);
       });
@@ -109,9 +110,13 @@ export function MemberTable() {
     [editingRow]
   );
 
+  const closeEdit = useCallback((): void => {
+    setEditingRow(null);
+  }, [editingRow]);
+
   /* TABLE */
   const table = useReactTable({
-    columns: MemberTableColumns,
+    columns: MemberTableColumns(editRow),
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -136,13 +141,32 @@ export function MemberTable() {
   function isRowSelected(selected: Row<DocumentData>): Boolean {
     return Boolean(
       selectedRows.find(
-        (row) => row.original.requestId === selected.original.requestId
+        (row) => row.original.memberId === selected.original.memberId
       )
     );
   }
 
-  const closeEdit = useCallback((): void => {
-    setEditingRow(null);
+  function formatData(searchTerm: string): void {
+    let filteredData = fetchedData;
+    if (searchTerm.length !== 0) {
+      filteredData = fetchedData.filter(
+        (document: DocumentData) =>
+          document.name.toLowerCase().includes(searchTerm) ||
+          document.email.toLowerCase().includes(searchTerm) ||
+          document.ssn.toLowerCase().includes(searchTerm)
+      );
+    }
+    setTableData(filteredData);
+  }
+
+  /* Delete Member */
+  const handleDelete = useCallback(() => {
+
+    deleteMemberHook({
+      selectedRows: [editingRow],
+      resetRowSelection: () => table.resetRowSelection(),
+      setDeleting: setDeleting,
+    });
   }, [editingRow]);
 
   const tableComponent = (
@@ -186,6 +210,7 @@ export function MemberTable() {
                 return (
                   <>
                     <Td
+                      py="0"
                       key={cell.id}
                       isNumeric={meta?.isNumeric}
                       background={isRowSelected(row) ? hover_color : ""}
@@ -200,14 +225,19 @@ export function MemberTable() {
               })}
             </Tr>
             {editingRow &&
-              editingRow.original.requestId === row.original.requestId && (
+              editingRow.original.memberId === row.original.memberId && (
                 <FormModal
                   isOpen={Boolean(editingRow)}
                   onClose={closeEdit}
                   title={"Edit Request"}
                   size="3xl"
                 >
-                  <EditRowForm row={editingRow} onClose={closeEdit} />
+                  <EditRowForm
+                    row={editingRow}
+                    onClose={closeEdit}
+                    handleDelete={handleDelete}
+                    isDeleting={isDeleting}
+                  />
                 </FormModal>
               )}
           </>
@@ -215,19 +245,6 @@ export function MemberTable() {
       </Tbody>
     </Table>
   );
-
-  function formatData(searchTerm: string): void {
-    let filteredData = fetchedData;
-    if (searchTerm.length !== 0) {
-      filteredData = fetchedData.filter(
-        (document: DocumentData) =>
-          document.name.toLowerCase().includes(searchTerm) ||
-          document.email.toLowerCase().includes(searchTerm) ||
-          document.ssn.toLowerCase().includes(searchTerm)
-      );
-    }
-    setTableData(filteredData);
-  }
 
   return (
     <>

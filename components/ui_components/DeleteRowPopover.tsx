@@ -9,13 +9,11 @@ import {
   PopoverFooter,
   Button,
   Box,
-  useToast,
 } from "@chakra-ui/react";
 import { Row } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import React, { useCallback, useState } from "react";
 import { ReactNode } from "react";
-import deleteRequestHandler from "../tables/RequestTable/DeleteRequestHandler";
 import Spinner from "./Spinner";
 
 type Props = {
@@ -23,32 +21,24 @@ type Props = {
   isDisabled?: boolean;
   variant?: string;
   header?: string;
-  resetRowSelection: (() => void);
-  selectedRows: Row<DocumentData>[];
+  handleDelete: Function;
+  isDeleting: boolean;
 };
 
 const DeleteRowPopover: React.FC<Props> = (props: Props) => {
   const [open, setOpen] = useState<boolean>(false);
-  const [isDeleting, setDeleting] = useState(false);
-
-  const handleDelete = useCallback(() => {
-    deleteRequestHandler({
-      selectedRows: props.selectedRows,
-      resetRowSelection: () => props.resetRowSelection(),
-      setDeleting: setDeleting,
-    });
-  }, [props.selectedRows]);
 
   return (
     <Box>
       <Popover isOpen={open}>
         <PopoverTrigger>
           <Button
+            size="sm"
             onClick={() => setOpen(!open)}
             isDisabled={props.isDisabled || false}
-            variant={props.variant ?? "outline"}
-            colorScheme={isDeleting || !props.isDisabled ? "red" : "gray"}
-            isLoading={isDeleting || false}
+            variant={props.isDisabled ? "outline" : props.variant ?? "solid"}
+            colorScheme={"red"}
+            isLoading={props.isDeleting || false}
             spinner={<Spinner outerColor="red.200" innerColor="red.500" />}
           >
             {props.children}
@@ -69,7 +59,7 @@ const DeleteRowPopover: React.FC<Props> = (props: Props) => {
               _hover={{ background: "red.50" }}
               onClick={() => {
                 setOpen(false);
-                handleDelete();
+                props.handleDelete();
               }}
             >
               delete

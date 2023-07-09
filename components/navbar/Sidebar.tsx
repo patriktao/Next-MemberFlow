@@ -58,9 +58,6 @@ const Sidebar: React.FC = () => {
         case "/archived":
           setSelectedNavItem("/archived");
           break;
-        case "/settings":
-          setSelectedNavItem("/settings");
-          break;
         case "/admins":
           setSelectedNavItem("/admins");
         default:
@@ -155,7 +152,7 @@ const Sidebar: React.FC = () => {
           <MenuButton width="100%" display="grid" justifyContent="center">
             <Divider display={"flex"} />
             <Flex mt={4} align="center">
-              <Avatar size="sm" src="avatar-1.jpg" />
+              <Avatar size="sm" />
               <Flex
                 flexDir="column"
                 ml={4}

@@ -1,7 +1,13 @@
 import { Button, ButtonGroup, Flex, Grid, useToast } from "@chakra-ui/react";
 import { DocumentData, Timestamp } from "firebase/firestore";
 import { isEqual } from "lodash";
-import { ChangeEvent, useCallback, useReducer, useState } from "react";
+import {
+  ChangeEvent,
+  ReactNode,
+  useCallback,
+  useReducer,
+  useState,
+} from "react";
 import { getTimestamp } from "../../../utils/date-utils";
 import { membershipPeriods, paymentMethods } from "../../../types";
 import Datepicker from "../../ui_components/Datepicker";
@@ -9,19 +15,25 @@ import Input from "../../ui_components/Input";
 import InputEmail from "../../ui_components/InputEmail";
 import Select from "../../ui_components/Select";
 import { reducer } from "./EditRowReducer";
-import LoadingButton from "../../ui_components/LoadingButton";
+import LoadingButton from "../../ui_components/LoadingSubmitButton";
 import { updateRequest } from "../../../pages/api/requestAPI/requestAPI";
 import displayToast from "../../ui_components/Toast";
 import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
-import deleteRequestHandler from "../RequestTable/DeleteRequestHandler";
 import { Row } from "@tanstack/react-table";
 
 interface Props {
-  row: Row<DocumentData>;
   onClose: Function;
+  handleDelete: Function;
+  row: Row<DocumentData>;
+  isDeleting: boolean;
 }
 
-const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
+const EditRowForm: React.FC<Props> = ({
+  onClose,
+  handleDelete,
+  row,
+  isDeleting,
+}: Props) => {
   const data = row.original;
   const [state, dispatch] = useReducer(reducer, {
     email: data.email,
@@ -40,8 +52,6 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
   const emailError = data.email === "" || false;
   const isChanged = !isEqual(state, row);
 
-  const [showDelete, setShowDelete] = useState(false);
-
   const handleChange: Function = useCallback(
     (e): void => {
       try {
@@ -54,17 +64,6 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
     [state]
   );
 
-  const [isDeleting, setDeleting] = useState<boolean>(false);
-
-  const handleDelete = () => {
-    deleteRequestHandler({
-      selectedRows: [row],
-      setDeleting: setDeleting,
-      toast: toast,
-      resetRowSelection: () => {},
-    });
-  };
-
   const toast = useToast();
 
   const handleSave = useCallback(
@@ -76,10 +75,8 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
           .then(() => {
             console.log("Edited request");
             displayToast({
-              toast: toast,
               title: "Successfully edit the request.",
               status: "success",
-              position: "right-top",
             });
             row.original = state;
             onClose();
@@ -87,7 +84,6 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
           .catch((error) => {
             setErrorMessage(error.message);
             displayToast({
-              toast: toast,
               title: "Error editing the request.",
               description: error.message,
               status: "error",
@@ -217,10 +213,8 @@ const EditRowForm: React.FC<Props> = ({ row, onClose }: Props) => {
         <ButtonGroup display="flex" justifyContent="space-between">
           <DeleteRowPopover
             header="Delete request"
-            isDeleting={isDeleting}
             handleDelete={handleDelete}
-            isOpen={showDelete}
-            setOpen={() => setShowDelete(!showDelete)}
+            isDeleting={isDeleting}
           >
             delete
           </DeleteRowPopover>

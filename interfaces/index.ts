@@ -14,6 +14,7 @@ export interface RequestForm {
 }
 
 export interface MemberForm {
+  memberId?: string;
   name: string;
   email: string;
   period: string;

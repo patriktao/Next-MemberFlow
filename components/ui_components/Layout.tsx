@@ -2,7 +2,6 @@ import React, { ReactNode } from "react";
 import Head from "next/head";
 import Sidebar from "../navbar/Sidebar";
 import { Box, Flex, Grid } from "@chakra-ui/react";
-import { component_color } from "../../styles/colors";
 
 type Props = {
   children?: ReactNode;

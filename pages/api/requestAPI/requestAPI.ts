@@ -23,10 +23,10 @@ export async function createUser(uid: string, email: string, password: string) {
 
 export async function createNewRequest(form: RequestForm): Promise<void> {
   try {
-    console.log(form);
     const uid = v4();
+    const sliced_uid = uid.slice(0,10)
     const createForm: RequestForm = {
-      requestId: uid,
+      requestId: sliced_uid,
       regDate: form.regDate,
       name: form.name,
       email: form.email,
@@ -37,7 +37,7 @@ export async function createNewRequest(form: RequestForm): Promise<void> {
       payMethod: form.payMethod,
       afMember: form.afMember,
     };
-    const createAttempt = setDoc(doc(requestCollection, uid), createForm);
+    const createAttempt = setDoc(doc(requestCollection, sliced_uid), createForm);
    //const createUserAttempt = createUser(uid, form.email, form.ssn);
     await callWithTimeout(createAttempt, 3000, "Create request timed out");
     /* await callWithTimeout(

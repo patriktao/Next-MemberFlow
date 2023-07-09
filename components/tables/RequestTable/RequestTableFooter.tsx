@@ -9,12 +9,13 @@ import {
 } from "@chakra-ui/react";
 import { PaginationState, Row, Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
+import { useState } from "react";
 import { createMember } from "../../../pages/api/memberAPI/memberAPI";
 import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
 import Alert from "../../ui_components/Alert";
 import Select from "../../ui_components/Select";
 import displayToast from "../../ui_components/Toast";
-import { IndeterminateCheckbox } from "./RequestTableColumns";
+import TableRowCheckbox from "../../ui_components/TableRowCheckbox";
 
 interface Props {
   selectedRows: Row<DocumentData>[];
@@ -23,10 +24,12 @@ interface Props {
 
 const RequestTableFooter = ({ selectedRows, table }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setLoading] = useState(false);
 
   const toast = useToast();
 
   function acceptRequests(): void {
+    setLoading(true);
     const createPromise = new Promise(async (resolve, reject) => {
       const promises = selectedRows.flatMap((row) => {
         return new Promise((resolve, reject) => {
@@ -45,6 +48,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
         const results = await Promise.all(promises); //waiting until all promises fulfilled
         resolve(results); //then we are done
       } catch (error) {
+        setLoading(false);
         reject(error); //otherwise reject and error.
       }
     });
@@ -58,6 +62,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
         });
         table.resetRowSelection();
         onClose();
+        setLoading(false);
       },
       (error) => {
         console.log(error);
@@ -66,6 +71,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
           title: "Error accepting requests",
           status: "error",
         });
+        setLoading(false);
       }
     );
   }
@@ -81,7 +87,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
       <Flex gap={"8px"} flexDir="column">
         <Flex gap="8px">
           Select Current Page
-          <IndeterminateCheckbox
+          <TableRowCheckbox
             {...{
               checked: table.getIsAllPageRowsSelected(),
               indeterminate: table.getIsSomePageRowsSelected(),
@@ -151,8 +157,10 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
           accept
         </Button>
         <Alert
+          isLoading={isLoading}
           isOpen={isOpen}
-          onClose={acceptRequests}
+          onClose={onClose}
+          onClick={acceptRequests}
           header={"Accept Requests"}
           body={"Are you sure? You can't undo this action afterwards."}
         />

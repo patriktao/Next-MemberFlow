@@ -13,7 +13,6 @@ import { getCurrentUser, logIn } from "../../pages/api/authAPI/authAPI";
 import displayToast from "../ui_components/Toast";
 import InputEmail from "../ui_components/InputEmail";
 import InputPassword from "../ui_components/InputPassword";
-import LoadingButton from "../ui_components/LoadingButton";
 import {
   getAuth,
   setPersistence,
@@ -21,6 +20,7 @@ import {
   signInWithEmailAndPassword,
   browserLocalPersistence,
 } from "firebase/auth";
+import LoadingSubmitButton from "../ui_components/LoadingSubmitButton";
 
 type Props = {};
 
@@ -106,9 +106,9 @@ const AuthForm: React.FC<Props> = (props: Props) => {
             </AlertDescription>
           </Alert>
         )}
-        <LoadingButton color="blue" isLoading={isLoading}>
+        <LoadingSubmitButton color="blue" isLoading={isLoading}>
           Login
-        </LoadingButton>
+        </LoadingSubmitButton>
       </Stack>
     </form>
   );

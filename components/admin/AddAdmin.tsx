@@ -5,7 +5,7 @@ import { DocumentData } from "firebase/firestore";
 import displayToast from "../ui_components/Toast";
 import { Heading } from "@chakra-ui/react";
 import InputEmail from "../ui_components/InputEmail";
-import LoadingButton from "../ui_components/LoadingButton";
+import LoadingButton from "../ui_components/LoadingSubmitButton";
 
 type Props = {
   toast: Function;

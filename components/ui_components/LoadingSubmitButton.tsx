@@ -10,7 +10,7 @@ interface Props {
   variant?: string;
 }
 
-const LoadingButton: React.FC<Props> = (props: Props) => {
+const LoadingSubmitButton: React.FC<Props> = (props: Props) => {
   return (
     <Button
       type="submit"
@@ -36,4 +36,4 @@ const LoadingButton: React.FC<Props> = (props: Props) => {
   );
 };
 
-export default LoadingButton;
+export default LoadingSubmitButton;
