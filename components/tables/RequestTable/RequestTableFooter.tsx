@@ -7,15 +7,13 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { PaginationState, Row, Table } from "@tanstack/react-table";
+import { Row, Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import { useState } from "react";
-import { createMember } from "../../../pages/api/memberAPI/memberAPI";
-import { deleteRequest } from "../../../pages/api/requestAPI/requestAPI";
 import Alert from "../../ui_components/Alert";
 import Select from "../../ui_components/Select";
-import displayToast from "../../ui_components/Toast";
 import TableRowCheckbox from "../../ui_components/TableRowCheckbox";
+import { acceptRequestHook } from "../../../hooks/RequestHooks";
 
 interface Props {
   selectedRows: Row<DocumentData>[];
@@ -25,55 +23,14 @@ interface Props {
 const RequestTableFooter = ({ selectedRows, table }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setLoading] = useState(false);
-
-  const toast = useToast();
-
+  
   function acceptRequests(): void {
-    setLoading(true);
-    const createPromise = new Promise(async (resolve, reject) => {
-      const promises = selectedRows.flatMap((row) => {
-        return new Promise((resolve, reject) => {
-          createMember(row.original)
-            .then((res) => {
-              deleteRequest(row.original.requestId)
-                .then((res) => resolve(res))
-                .catch((error) => reject(error));
-              resolve(res);
-            })
-            .catch((error) => reject(error));
-        });
-      });
-
-      try {
-        const results = await Promise.all(promises); //waiting until all promises fulfilled
-        resolve(results); //then we are done
-      } catch (error) {
-        setLoading(false);
-        reject(error); //otherwise reject and error.
-      }
+    acceptRequestHook({
+      setLoading: setLoading,
+      onClose: () => onClose(),
+      resetRowSelection: () => table.resetRowSelection(),
+      selectedRows: selectedRows,
     });
-
-    createPromise.then(
-      (res) => {
-        displayToast({
-          toast: toast,
-          title: "Successfully accepted requests",
-          status: "success",
-        });
-        table.resetRowSelection();
-        onClose();
-        setLoading(false);
-      },
-      (error) => {
-        console.log(error);
-        displayToast({
-          toast: toast,
-          title: "Error accepting requests",
-          status: "error",
-        });
-        setLoading(false);
-      }
-    );
   }
 
   return (

@@ -10,18 +10,16 @@ import {
   MenuItem,
   MenuList,
   useToast,
-  Box,
   Text,
 } from "@chakra-ui/react";
 import { FiHome, FiCalendar, FiKey, FiUserPlus, FiUsers } from "react-icons/fi";
 import NavItem from "./NavItem";
-import { component_color } from "../../styles/colors";
 import { useRouter } from "next/router";
 import { NavContext } from "../../pages/contexts/NavContext";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { getCurrentUser, logOut } from "../../pages/api/authAPI/authAPI";
-import displayToast from "../ui_components/Toast";
 import { getAdmin } from "../../pages/api/adminAPI/adminAPI";
+import { defaultToastProps } from "../../utils";
 
 const Sidebar: React.FC = () => {
   const { pathname } = useRouter();
@@ -35,15 +33,6 @@ const Sidebar: React.FC = () => {
   }
 
   useEffect(() => {
-    const getUsername = async () => {
-      const user = await getCurrentUser();
-      if (user !== undefined && user !== null) {
-        await getAdmin(user.uid).then((res) => {
-          setUser(res.name);
-        });
-      }
-    };
-
     const sidebarFocus = () => {
       switch (pathname) {
         case "/home":
@@ -66,7 +55,6 @@ const Sidebar: React.FC = () => {
     };
 
     sidebarFocus();
-    getUsername();
   }, []);
 
   const toast = useToast();
@@ -74,19 +62,19 @@ const Sidebar: React.FC = () => {
   const handleLogOut = async () =>
     await logOut()
       .then(() => {
-        displayToast({
-          toast: toast,
+        toast({
           title: "Successfully logged out.",
           status: "success",
+          ...defaultToastProps,
         });
         localStorage.removeItem("authToken");
         router.push("/");
       })
       .catch((error) =>
-        displayToast({
-          toast: toast,
+        toast({
           title: error.message,
           status: "error",
+          ...defaultToastProps,
         })
       );
 

@@ -3,8 +3,6 @@ import {
   setDoc,
   doc,
   deleteDoc,
-  DocumentData,
-  onSnapshot,
   updateDoc,
 } from "firebase/firestore";
 import { db, fbFunctions } from "../firebase";

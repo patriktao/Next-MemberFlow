@@ -10,21 +10,19 @@ import {
 } from "@chakra-ui/react";
 
 import { getCurrentUser, logIn } from "../../pages/api/authAPI/authAPI";
-import displayToast from "../ui_components/Toast";
 import InputEmail from "../ui_components/InputEmail";
 import InputPassword from "../ui_components/InputPassword";
 import {
   getAuth,
   setPersistence,
-  browserSessionPersistence,
-  signInWithEmailAndPassword,
   browserLocalPersistence,
 } from "firebase/auth";
 import LoadingSubmitButton from "../ui_components/LoadingSubmitButton";
+import { defaultToastProps } from "../../utils";
 
 type Props = {};
 
-const AuthForm: React.FC<Props> = (props: Props) => {
+const AuthForm: React.FC<Props> = () => {
   /* States */
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,30 +35,35 @@ const AuthForm: React.FC<Props> = (props: Props) => {
 
   /* Functions */
   const router = useRouter();
+  const auth = getAuth();
   const toast = useToast();
 
-  const auth = getAuth();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault();
     setLoading(true);
-    //SetPersistance is used to persist a user's session
+    // SetPersistance is used to persist a user's session
     setPersistence(auth, browserLocalPersistence)
       .then(() => {
         return logIn(email, password)
           .then(async () => {
-            displayToast({
-              toast: toast,
-              title: "Successfully logged in.",
-              status: "success",
-            });
-            localStorage.setItem(
-              "authToken",
-              await getCurrentUser().getIdToken()
-            );
-            router.push("/home");
-            console.log(getCurrentUser());
-            setLoading(false);
+            try {
+              toast({
+                title: "Successfully logged in.",
+                status: "success",
+                ...defaultToastProps,
+              });
+              localStorage.setItem(
+                "authToken",
+                await getCurrentUser().getIdToken()
+              );
+              router.push("/home");
+              console.log(getCurrentUser());
+              setLoading(false);
+            } catch (error) {
+              setErrorMessage(error.message);
+              console.error("Error signing in:", error);
+              setLoading(false);
+            }
           })
           .catch((error) => {
             setErrorMessage(error.message);
@@ -72,7 +75,7 @@ const AuthForm: React.FC<Props> = (props: Props) => {
         console.log(error.code);
         console.log(error.message);
       });
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>

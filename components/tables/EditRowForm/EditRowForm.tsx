@@ -1,25 +1,19 @@
 import { Button, ButtonGroup, Flex, Grid, useToast } from "@chakra-ui/react";
 import { DocumentData, Timestamp } from "firebase/firestore";
 import { isEqual } from "lodash";
-import {
-  ChangeEvent,
-  ReactNode,
-  useCallback,
-  useReducer,
-  useState,
-} from "react";
+import { ChangeEvent, useCallback, useReducer, useState } from "react";
 import { getTimestamp } from "../../../utils/date-utils";
 import { membershipPeriods, paymentMethods } from "../../../types";
 import Datepicker from "../../ui_components/Datepicker";
 import Input from "../../ui_components/Input";
 import InputEmail from "../../ui_components/InputEmail";
 import Select from "../../ui_components/Select";
-import { reducer } from "./EditRowReducer";
 import LoadingButton from "../../ui_components/LoadingSubmitButton";
 import { updateRequest } from "../../../pages/api/requestAPI/requestAPI";
-import displayToast from "../../ui_components/Toast";
 import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
 import { Row } from "@tanstack/react-table";
+import { defaultToastProps } from "../../../utils";
+import { editRequestHook } from "../../../hooks/RequestHooks";
 
 interface Props {
   onClose: Function;
@@ -27,6 +21,59 @@ interface Props {
   row: Row<DocumentData>;
   isDeleting: boolean;
 }
+
+export interface State {
+  email: string;
+  name: string;
+  ssn: string;
+  gender: string;
+  afMember: string;
+  payMethod: string;
+  period: string;
+  hasPaid: string;
+  regDate: Timestamp;
+  requestId: string;
+}
+
+export type Action =
+  | { type: "email"; input: string }
+  | { type: "name"; input: string }
+  | { type: "ssn"; input: string }
+  | { type: "gender"; input: string }
+  | { type: "afMember"; input: string }
+  | { type: "payMethod"; input: string }
+  | { type: "hasPaid"; input: string }
+  | { type: "period"; input: string }
+  | { type: "regDate"; input: Timestamp };
+
+export const reducer = (state: State, action: Action): State => {
+  try {
+    switch (action.type) {
+      case "email":
+        return { ...state, email: action.input };
+      case "name":
+        return { ...state, name: action.input };
+      case "gender":
+        return { ...state, gender: action.input };
+      case "ssn":
+        return { ...state, ssn: action.input };
+      case "afMember":
+        return { ...state, afMember: action.input };
+      case "payMethod":
+        return { ...state, payMethod: action.input };
+      case "period":
+        return { ...state, period: action.input };
+      case "hasPaid":
+        return { ...state, hasPaid: action.input };
+      case "regDate":
+        return { ...state, regDate: action.input };
+      default:
+        return state;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const EditRowForm: React.FC<Props> = ({
   onClose,
@@ -64,32 +111,17 @@ const EditRowForm: React.FC<Props> = ({
     [state]
   );
 
-  const toast = useToast();
-
   const handleSave = useCallback(
     async (e) => {
       e.preventDefault();
       if (isChanged) {
-        setLoading(true);
-        await updateRequest(state)
-          .then(() => {
-            console.log("Edited request");
-            displayToast({
-              title: "Successfully edit the request.",
-              status: "success",
-            });
-            row.original = state;
-            onClose();
-          })
-          .catch((error) => {
-            setErrorMessage(error.message);
-            displayToast({
-              title: "Error editing the request.",
-              description: error.message,
-              status: "error",
-            });
-          });
-        setLoading(false);
+        editRequestHook({
+          setLoading: setLoading,
+          row: row,
+          onClose: onClose,
+          state: state,
+          setErrorMessage: setErrorMessage,
+        });
       }
     },
     [state]

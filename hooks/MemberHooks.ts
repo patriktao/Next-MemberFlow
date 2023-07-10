@@ -1,8 +1,8 @@
 import { useToast } from "@chakra-ui/react";
 import { Row } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
-import displayToast from "../components/ui_components/Toast";
 import { deleteMember } from "../pages/api/memberAPI/memberAPI";
+import { defaultToastProps } from "../utils";
 
 interface deleteProps {
   selectedRows: Row<DocumentData>[];
@@ -39,20 +39,20 @@ export function deleteMemberHook({
 
   deletePromise.then(
     (res) => {
-      displayToast({
-        toast: toast,
+      toast({
         title: "Successfully removed member.",
         status: "success",
+        ...defaultToastProps,
       });
       resetRowSelection();
       setDeleting(false);
     },
     (error) => {
       console.log(error);
-      displayToast({
-        toast: toast,
+      toast({
         title: "Error removing member.",
         status: "error",
+        ...defaultToastProps,
       });
       setDeleting(false);
     }

@@ -1,3 +1,5 @@
+import { ToastPosition } from "@chakra-ui/react";
+
 export function callWithTimeout<T>(
   call: Promise<T>,
   timeout: number,
@@ -22,11 +24,17 @@ export function callWithTimeout<T>(
   });
 }
 
-export const mapToOptions: (list: string[]) => { label: string; value: string }[] = (
-  list
-) => {
+export const mapToOptions: (
+  list: string[]
+) => { label: string; value: string }[] = (list) => {
   return list.map((item) => ({
     label: item,
     value: item,
   }));
+};
+
+export const defaultToastProps = {
+  position: "top" as ToastPosition,
+  duration: 4000,
+  isClosable: true,
 };

@@ -39,7 +39,7 @@ import FormModal from "../../ui_components/FormModal";
 import RequestTableFooter from "./RequestTableFooter";
 import TableOptions from "../TableOptions";
 import { db } from "../../../pages/api/firebase";
-import { requestImport } from "../../csv/ImportHooks";
+import { requestImport } from "../../../hooks/CSVHooks";
 import { deleteRequestHook } from "../../../hooks/RequestHooks";
 
 const RequestTable: React.FC = () => {

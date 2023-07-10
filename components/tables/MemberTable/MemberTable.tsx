@@ -29,7 +29,7 @@ import { hover_color } from "../../../styles/colors";
 import FormModal from "../../ui_components/FormModal";
 import EditRowForm from "../EditRowForm/EditRowForm";
 import TableOptions from "../TableOptions";
-import { memberImport } from "../../csv/ImportHooks";
+import { memberImport } from "../../../hooks/CSVHooks";
 import { deleteMemberHook } from "../../../hooks/MemberHooks";
 
 export function MemberTable() {

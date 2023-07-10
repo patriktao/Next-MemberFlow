@@ -1,11 +1,11 @@
 import { useToast } from "@chakra-ui/react";
-import { MemberForm, RequestForm } from "../../interfaces";
-import { createNewRequest } from "../../pages/api/requestAPI/requestAPI";
-import { toTimestamp } from "../../utils/date-utils";
-import displayToast from "../ui_components/Toast";
+import { MemberForm, RequestForm } from "../interfaces";
+import { createNewRequest } from "../pages/api/requestAPI/requestAPI";
+import { toTimestamp } from "../utils/date-utils";
 import { v4 } from "uuid";
 import { Result } from "react-spreadsheet-import/types/types";
-import { addExistingMember } from "../../pages/api/memberAPI/memberAPI";
+import { addExistingMember } from "../pages/api/memberAPI/memberAPI";
+import { defaultToastProps } from "../utils";
 
 export function isInvalid(data: Result<string>) {
   const toast = useToast();
@@ -13,12 +13,11 @@ export function isInvalid(data: Result<string>) {
     console.log("result is undefined or null");
     return true;
   } else if (data.validData.length === 0) {
-    displayToast({
-      toast: toast,
+    toast({
       title: "No valid data has been submitted.",
       description: "Try again",
       status: "error",
-      position: "top",
+      ...defaultToastProps,
     });
     console.log("invalid data:");
     console.log(data.invalidData);
@@ -67,21 +66,19 @@ export function requestImport(data: Result<string>) {
 
   createRequestPromise.then(
     (res) => {
-      displayToast({
-        toast: toast,
+      toast({
         title: "Successfully added a new request.",
         status: "success",
-        position: "top",
+        ...defaultToastProps,
       });
     },
     (error) => {
       console.log(error);
-      displayToast({
-        toast: toast,
+      toast({
         title: "Error adding a new request.",
         description: error.message,
         status: "error",
-        position: "top",
+        ...defaultToastProps,
       });
     }
   );
@@ -89,7 +86,7 @@ export function requestImport(data: Result<string>) {
 
 export const memberImport: (data: Result<string>) => void = (data) => {
   const toast = useToast();
-  
+
   if (isInvalid(data)) {
     return;
   }
@@ -124,21 +121,19 @@ export const memberImport: (data: Result<string>) => void = (data) => {
 
   createRequestPromise.then(
     (res) => {
-      displayToast({
-        toast: toast,
+      toast({
         title: "Successfully added new members.",
         status: "success",
-        position: "top",
+        ...defaultToastProps,
       });
     },
     (error) => {
       console.log(error);
-      displayToast({
-        toast: toast,
+      toast({
         title: "Error adding new members.",
         description: error.message,
         status: "error",
-        position: "top",
+        ...defaultToastProps,
       });
     }
   );
