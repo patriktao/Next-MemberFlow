@@ -31,7 +31,6 @@ import { createNewRequest } from "../../../pages/api/requestAPI/requestAPI";
 import { membershipPeriods, paymentMethods } from "../../../types";
 import InputEmail from "../../ui_components/InputEmail";
 import LoadingSubmitButton from "../../ui_components/LoadingSubmitButton";
-import displayToast from "../../ui_components/Toast";
 import GDPR from "./GDPR/GDPR";
 import { v4 } from "uuid";
 import { createRequestHook } from "../../../hooks/RequestHooks";
@@ -102,9 +101,10 @@ const AddRequestForm: React.FC<Props> = (props: Props) => {
 
     createRequestHook({
       requestForm: requestForm,
-      onCancel: props.onCancel(),
-      reset: () => resetForm(),
+      onCancel: props.onCancel,
+      reset: resetForm,
       setErrorMessage: setErrorMessage,
+      toast: toast,
     });
     setLoading(false);
   };

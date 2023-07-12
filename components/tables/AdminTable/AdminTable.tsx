@@ -32,8 +32,8 @@ import { httpsCallable } from "firebase/functions";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { db, fbFunctions } from "../../../pages/api/firebase";
 import { hover_color } from "../../../styles/colors";
+import { defaultToastProps } from "../../../utils";
 import AddAdminModal from "../../admin/AddAdminModal";
-import displayToast from "../../ui_components/Toast";
 import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
 import AdminTableColumns from "./AdminTableColumns";
 
@@ -159,22 +159,20 @@ const AdminTable = () => {
               adminID: e.original.adminID,
             })
               .then(() => {
-                displayToast({
-                  toast: toast,
+                toast({
                   title: "Successfully removed admin.",
                   status: "success",
-                  position: "top-right",
+                  ...defaultToastProps,
                 });
                 setDeleting(false);
               })
               .catch((error) => {
                 console.log(error);
-                displayToast({
-                  toast: toast,
+                toast({
                   title: "Error removing admin.",
                   description: error.message,
                   status: "error",
-                  position: "top-right",
+                  ...defaultToastProps,
                 });
                 setDeleting(false);
               });
@@ -184,22 +182,20 @@ const AdminTable = () => {
 
       deletePromise
         .then(() => {
-          displayToast({
-            toast: toast,
+          toast({
             title: "Successfully removed admin.",
             status: "success",
-            position: "top-right",
+            ...defaultToastProps,
           });
           table.resetRowSelection();
           setDeleting(false);
         })
         .catch((error) => {
           console.error(error);
-          displayToast({
-            toast: toast,
+          toast({
             title: "Error removing admin.",
             status: "error",
-            position: "top-right",
+            ...defaultToastProps,
           });
           setDeleting(false);
         });

@@ -2,10 +2,10 @@ import { addAdmin } from "../../pages/api/adminAPI/adminAPI";
 import React, { useState } from "react";
 import { Table } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
-import displayToast from "../ui_components/Toast";
-import { Heading } from "@chakra-ui/react";
+import { Heading, useToast } from "@chakra-ui/react";
 import InputEmail from "../ui_components/InputEmail";
 import LoadingButton from "../ui_components/LoadingSubmitButton";
+import { defaultToastProps } from "../../utils";
 
 type Props = {
   toast: Function;
@@ -13,18 +13,13 @@ type Props = {
   onClose: Function;
 };
 
-type CloudFuncProp = {
-  data: {
-    status: string;
-    success: boolean;
-  };
-};
-
-const AddAdmin = (props: Props) => {
+const AddAdmin: React.FC = (props: Props) => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const emailError = email === "";
+
+  const toast = useToast();
 
   function handleChange(event) {
     setEmail(event.target.value);
@@ -35,23 +30,22 @@ const AddAdmin = (props: Props) => {
     setLoading(true);
     addAdmin(email)
       .then(() => {
-        displayToast({
-          toast: props.toast,
+        toast({
           title: "Successfully added admin.",
           status: "success",
           position: "top-right",
+          ...defaultToastProps,
         });
         setLoading(false);
         props.onClose();
       })
       .catch((error) => {
         console.log(error);
-        displayToast({
-          toast: props.toast,
+        toast({
           title: "Error adding admin.",
           description: error.message,
           status: "error",
-          position: "top-right",
+          ...defaultToastProps,
         });
         setLoading(false);
       });

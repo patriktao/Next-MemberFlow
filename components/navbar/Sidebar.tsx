@@ -1,7 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
 import {
   Flex,
-  IconButton,
   Divider,
   Avatar,
   Heading,
@@ -16,17 +15,16 @@ import { FiHome, FiCalendar, FiKey, FiUserPlus, FiUsers } from "react-icons/fi";
 import NavItem from "./NavItem";
 import { useRouter } from "next/router";
 import { NavContext } from "../../pages/contexts/NavContext";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import { getCurrentUser, logOut } from "../../pages/api/authAPI/authAPI";
-import { getAdmin } from "../../pages/api/adminAPI/adminAPI";
+import { logOut } from "../../pages/api/authAPI/authAPI";
 import { defaultToastProps } from "../../utils";
+import { AuthContext } from "../../pages/contexts/AuthContext";
 
 const Sidebar: React.FC = () => {
-  const { pathname } = useRouter();
-  const context = useContext(NavContext);
-  const { selectedNavItem, setSelectedNavItem } = context;
   const router = useRouter();
-  const [user, setUser] = useState<string>("");
+  const context = useContext(NavContext);
+  const { pathname } = useRouter();
+  const { selectedNavItem, setSelectedNavItem } = context;
+  const { authUser } = useContext(AuthContext);
 
   if (!context) {
     throw new Error("CountContext is undefined");
@@ -145,10 +143,15 @@ const Sidebar: React.FC = () => {
                 flexDir="column"
                 ml={4}
                 display={{ base: "none", md: "block" }}
+                overflow="hidden"
               >
-                <Heading as="h3" size="sm" textAlign={"center"}>
-                  {user}
-                  {<ChevronRightIcon marginLeft="4px" />}
+                <Heading
+                  as="h3"
+                  size="sm"
+                  textAlign={"center"}
+                  fontWeight="medium"
+                >
+                  {authUser}
                 </Heading>
               </Flex>
             </Flex>

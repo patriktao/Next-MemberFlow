@@ -12,6 +12,7 @@ import {
   useDisclosure,
   Box,
   ButtonGroup,
+  useToast,
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
@@ -170,14 +171,15 @@ const RequestTable: React.FC = () => {
     setTableData(filteredData);
   }
 
+  const toast = useToast();
   const [isDeleting, setDeleting] = useState<boolean>(false);
 
-  /* Delete Member */
   const handleDelete = useCallback(() => {
     deleteRequestHook({
-      selectedRows: [editingRow],
+      selectedRows: selectedRows,
       resetRowSelection: () => table.resetRowSelection(),
       setDeleting: setDeleting,
+      toast: toast,
     });
   }, [editingRow]);
 
@@ -264,8 +266,7 @@ const RequestTable: React.FC = () => {
                   <EditRowForm
                     row={editingRow}
                     onClose={closeEdit}
-                    handleDelete={handleDelete}
-                    isDeleting={isDeleting}
+                    table={table}
                   />
                 </FormModal>
               )}

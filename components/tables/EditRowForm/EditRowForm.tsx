@@ -11,16 +11,12 @@ import Select from "../../ui_components/Select";
 import LoadingButton from "../../ui_components/LoadingSubmitButton";
 import { updateRequest } from "../../../pages/api/requestAPI/requestAPI";
 import DeleteRowPopover from "../../ui_components/DeleteRowPopover";
-import { Row } from "@tanstack/react-table";
+import { Row, Table } from "@tanstack/react-table";
 import { defaultToastProps } from "../../../utils";
-import { editRequestHook } from "../../../hooks/RequestHooks";
-
-interface Props {
-  onClose: Function;
-  handleDelete: Function;
-  row: Row<DocumentData>;
-  isDeleting: boolean;
-}
+import {
+  deleteRequestHook,
+  editRequestHook,
+} from "../../../hooks/RequestHooks";
 
 export interface State {
   email: string;
@@ -75,12 +71,13 @@ export const reducer = (state: State, action: Action): State => {
   }
 };
 
-const EditRowForm: React.FC<Props> = ({
-  onClose,
-  handleDelete,
-  row,
-  isDeleting,
-}: Props) => {
+interface Props {
+  onClose: Function;
+  row: Row<DocumentData>;
+  table: Table<DocumentData>;
+}
+
+const EditRowForm: React.FC<Props> = ({ onClose, row, table }) => {
   const data = row.original;
   const [state, dispatch] = useReducer(reducer, {
     email: data.email,
@@ -111,6 +108,18 @@ const EditRowForm: React.FC<Props> = ({
     [state]
   );
 
+  const toast = useToast();
+  const [isDeleting, setDeleting] = useState<boolean>(false);
+
+  const handleDelete = useCallback(() => {
+    deleteRequestHook({
+      selectedRows: [row],
+      resetRowSelection: () => table.resetRowSelection(),
+      setDeleting: setDeleting,
+      toast: toast,
+    });
+  }, [row]);
+
   const handleSave = useCallback(
     async (e) => {
       e.preventDefault();
@@ -121,6 +130,7 @@ const EditRowForm: React.FC<Props> = ({
           onClose: onClose,
           state: state,
           setErrorMessage: setErrorMessage,
+          toast: toast,
         });
       }
     },

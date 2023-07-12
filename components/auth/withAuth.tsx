@@ -12,7 +12,6 @@ const withAuth = <P extends Record<string, unknown>>(
       const checkAuth = async () => {
         const user = localStorage.getItem("authToken");
         if (!user) {
-          // User is not authenticated, redirect to sign-in page
           localStorage.removeItem("authToken");
           router.push("/");
         }

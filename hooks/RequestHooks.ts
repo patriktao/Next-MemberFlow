@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/react";
+import { CreateToastFnReturn, useToast } from "@chakra-ui/react";
 import { Row } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import { State } from "../components/tables/EditRowForm/EditRowForm";
@@ -11,12 +11,12 @@ import {
 } from "../pages/api/requestAPI/requestAPI";
 import { defaultToastProps } from "../utils";
 
-
 interface createProps {
   requestForm: RequestForm;
   onCancel: Function;
   reset: Function;
   setErrorMessage: Function;
+  toast: CreateToastFnReturn;
 }
 
 export function createRequestHook({
@@ -24,10 +24,9 @@ export function createRequestHook({
   onCancel,
   reset,
   setErrorMessage,
+  toast,
 }: createProps) {
-  const toast = useToast();
-
-  createNewRequest(requestForm)
+  return createNewRequest(requestForm)
     .then(() => {
       toast({
         title: "Successfully added a new request.",
@@ -52,20 +51,18 @@ interface deleteProps {
   selectedRows: Row<DocumentData>[];
   setDeleting: Function;
   resetRowSelection: Function;
+  toast: CreateToastFnReturn;
 }
 
 export function deleteRequestHook({
   selectedRows,
   setDeleting,
   resetRowSelection,
+  toast, 
 }: deleteProps): void {
   const deletePromise = new Promise(async (resolve, reject) => {
-    const toast = useToast();
     setDeleting(true);
-    console.log(selectedRows);
-
     const promises = selectedRows.flatMap((e) => {
-      //Promise for every delete
       return new Promise((resolve, reject) => {
         deleteRequest(e.original.requestId)
           .then((res) => resolve(res))
@@ -74,10 +71,10 @@ export function deleteRequestHook({
     });
 
     try {
-      const results = await Promise.all(promises); //waiting until all promises fulfilled
-      resolve(results); //then we are done
+      const results = await Promise.all(promises);
+      resolve(results);
     } catch (error) {
-      reject(error); //otherwise reject and error.p
+      reject(error);
     }
 
     deletePromise.then(
@@ -91,7 +88,7 @@ export function deleteRequestHook({
         setDeleting(false);
       },
       (error) => {
-        console.log(error);
+        console.error(error);
         toast({
           title: "Error removing requests.",
           status: "error",
@@ -109,6 +106,7 @@ interface editProps {
   onClose: Function;
   setErrorMessage: (string) => void;
   state: State;
+  toast: CreateToastFnReturn;
 }
 
 export const editRequestHook = ({
@@ -117,8 +115,8 @@ export const editRequestHook = ({
   onClose,
   setErrorMessage,
   state,
+  toast,
 }: editProps) => {
-  const toast = useToast();
   setLoading(true);
   updateRequest(state)
     .then(() => {
@@ -145,9 +143,10 @@ export const editRequestHook = ({
 
 interface acceptProps {
   setLoading: Function;
-  onClose: () => void;
+  onClose: Function;
   resetRowSelection: () => void;
   selectedRows: Row<DocumentData>[];
+  toast: CreateToastFnReturn;
 }
 
 export function acceptRequestHook({
@@ -155,8 +154,8 @@ export function acceptRequestHook({
   onClose,
   resetRowSelection,
   selectedRows,
+  toast,
 }: acceptProps) {
-  const toast = useToast();
   setLoading(true);
   const createPromise = new Promise(async (resolve, reject) => {
     const promises = selectedRows.flatMap((row) => {
@@ -173,11 +172,11 @@ export function acceptRequestHook({
     });
 
     try {
-      const results = await Promise.all(promises); //waiting until all promises fulfilled
-      resolve(results); //then we are done
+      const results = await Promise.all(promises);
+      resolve(results);
     } catch (error) {
       setLoading(false);
-      reject(error); //otherwise reject and error.
+      reject(error);
     }
   });
 

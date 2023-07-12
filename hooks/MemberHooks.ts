@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/react";
+import { CreateToastFnReturn, useToast } from "@chakra-ui/react";
 import { Row } from "@tanstack/react-table";
 import { DocumentData } from "firebase/firestore";
 import { deleteMember } from "../pages/api/memberAPI/memberAPI";
@@ -8,12 +8,14 @@ interface deleteProps {
   selectedRows: Row<DocumentData>[];
   setDeleting: Function;
   resetRowSelection: Function;
+  toast: CreateToastFnReturn;
 }
 
 export function deleteMemberHook({
   selectedRows,
   setDeleting,
   resetRowSelection,
+  toast,
 }: deleteProps): void {
   const deletePromise = new Promise(async (resolve, reject) => {
     setDeleting(true);
@@ -34,8 +36,6 @@ export function deleteMemberHook({
       reject(error); //otherwise reject and error.
     }
   });
-
-  const toast = useToast();
 
   deletePromise.then(
     (res) => {

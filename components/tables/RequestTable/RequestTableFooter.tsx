@@ -22,14 +22,16 @@ interface Props {
 
 const RequestTableFooter = ({ selectedRows, table }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
   const [isLoading, setLoading] = useState(false);
-  
+
   function acceptRequests(): void {
     acceptRequestHook({
       setLoading: setLoading,
-      onClose: () => onClose(),
+      onClose: onClose,
       resetRowSelection: () => table.resetRowSelection(),
       selectedRows: selectedRows,
+      toast: toast,
     });
   }
 
@@ -117,7 +119,7 @@ const RequestTableFooter = ({ selectedRows, table }: Props) => {
           isLoading={isLoading}
           isOpen={isOpen}
           onClose={onClose}
-          onClick={acceptRequests}
+          onClick={() => acceptRequests}
           header={"Accept Requests"}
           body={"Are you sure? You can't undo this action afterwards."}
         />
