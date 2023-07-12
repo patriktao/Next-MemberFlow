@@ -58,3 +58,13 @@ export function deleteMemberHook({
     }
   );
 }
+
+interface getProps {
+  id: string;
+}
+
+export function getMemberHook({
+  id
+}: getProps) {
+  return id;
+}
